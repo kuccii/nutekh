@@ -1,11 +1,11 @@
 /*-----------------------------------------------------------------------------------
 
-    Theme Name: Mivon
-    Theme URI: http://
-    Description: Creative Agency & Portfolio
-    Author: UI-ThemeZ
-    Author URI: http://themeforest.net/user/UI-ThemeZ
-    Version: 1.0
+    Theme Name: Nutekh
+    Theme URI: https://nutekh.vercel.app
+    Description: Nutekh growth agency website
+    Author: Nutekh
+    Author URI: https://nutekh.vercel.app
+    Version: 1.1
 
 -----------------------------------------------------------------------------------*/
 
