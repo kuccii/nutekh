@@ -37,7 +37,7 @@ Avoid: distorted hands, extra fingers, unreadable tiny UI text, glossy plastic s
 
 ## 1. Unsplash replacements (slots A–L)
 
-These URLs appear across **`index.html`**, **`page-about.html`**, **`page-services.html`**, **`page-team.html`**, **`page-pricing.html`**, **`page-contact.html`**, **`portfolio-grid.html`**, **`blog.html`**. Generate **one image per slot**, export WebP/JPEG, then replace URLs in HTML with `assets/imgs/...`.
+These URLs appear across **`index.html`**, **`about.html`**, **`services.html`**, **`team.html`**, **`pricing.html`**, **`contact.html`**, **`projects.html`** (case studies index), **`blog.html`**. Generate **one image per slot**, export WebP/JPEG, then replace URLs in HTML with `assets/imgs/...`.
 
 **Unsplash ID → slot**
 
@@ -596,7 +596,7 @@ Get-ChildItem -Path . -Recurse -File -Include *.html | Select-String -Pattern 'i
 Select-String -Path 'assets\css\style.css' -Pattern 'url\('
 ```
 
-**Funnel pages to eyeball first:** `index.html`, `page-services.html`, `page-about.html`, `page-contact.html`, `marketing-engine.html`, `package-launch.html`, `package-grow.html`, `package-scale.html`, `page-pricing.html`.
+**Funnel pages to eyeball first:** `index.html`, `services.html`, `about.html`, `contact.html`, `marketing-engine.html`, `package-launch.html`, `package-grow.html`, `package-scale.html`, `pricing.html`.
 
 ---
 

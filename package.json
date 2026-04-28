@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node ./node_modules/@11ty/eleventy/cmd.cjs --serve",
     "build": "node ./node_modules/@11ty/eleventy/cmd.cjs",
-    "normalize-links": "node scripts/normalize-internal-links.mjs"
+    "normalize-links": "node scripts/normalize-internal-links.mjs",
+    "rename-page-paths": "node scripts/replace-page-paths.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0"

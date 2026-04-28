@@ -1,5 +1,5 @@
 /**
- * Rewrites internal links from page-about.html → /page-about (extensionless, absolute-from-root).
+ * Rewrites internal links from about.html → /about (extensionless, absolute-from-root).
  * Skips http(s), mailto, tel, javascript, anchors-only, and paths already starting with /
  */
 import fs from "fs";

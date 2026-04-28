@@ -2,6 +2,15 @@
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "_site",
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/page-about", "destination": "/about", "permanent": true },
+    { "source": "/page-contact", "destination": "/contact", "permanent": true },
+    { "source": "/page-services", "destination": "/services", "permanent": true },
+    { "source": "/page-pricing", "destination": "/pricing", "permanent": true },
+    { "source": "/page-team", "destination": "/team", "permanent": true },
+    { "source": "/page-faqs", "destination": "/faqs", "permanent": true },
+    { "source": "/portfolio-grid", "destination": "/projects", "permanent": true }
+  ]
 }
 

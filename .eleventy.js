@@ -2,7 +2,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("assets");
   eleventyConfig.addPassthroughCopy("robots.txt");
 
-  // Default output: `_site/page-about/index.html` so URLs `/page-about` work without `.html` in the browser.
+  // Default output: `_site/about/index.html` so URLs like `/about` work without `.html` in the browser.
 
   return {
     dir: {
