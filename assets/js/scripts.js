@@ -1090,21 +1090,56 @@ $(window).on("load", function () {
 
     $('#contact-form').on('submit', function (e) {
         if (!e.isDefaultPrevented()) {
-            var url = "contact.php";
-
+            var $form = $(this);
             $.ajax({
                 type: "POST",
-                url: url,
-                data: $(this).serialize(),
+                url: "/api/contact",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify({
+                    name: $form.find('[name="name"]').val(),
+                    email: $form.find('[name="email"]').val(),
+                    message: $form.find('[name="message"]').val(),
+                    website: $form.find('[name="website"]').val() || "",
+                    subject: $form.find('[name="subject"]').val() || ""
+                }),
+                dataType: "json",
                 success: function (data) {
-                    var messageAlert = 'alert-' + data.type;
-                    var messageText = data.message;
-
-                    var alertBox = '<div class="alert ' + messageAlert + ' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' + messageText + '</div>';
-                    if (messageAlert && messageText) {
-                        $('#contact-form').find('.messages').html(alertBox);
-                        $('#contact-form')[0].reset();
+                    var messageAlert = data && data.ok ? "alert-success" : "alert-danger";
+                    var messageText =
+                        data && data.message
+                            ? data.message
+                            : data && data.ok
+                              ? "Thanks. Your message has been received."
+                              : "Something went wrong.";
+                    var alertBox =
+                        '<div class="alert ' +
+                        messageAlert +
+                        ' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                        messageText +
+                        "</div>";
+                    if (messageText) {
+                        $form.find(".messages").html(alertBox);
+                        if (data && data.ok) {
+                            $form[0].reset();
+                        }
                     }
+                },
+                error: function (xhr) {
+                    var messageText =
+                        "We could not send that just now. Please email hello@nutekh.com or WhatsApp us.";
+                    try {
+                        var j = xhr.responseJSON || (xhr.responseText && JSON.parse(xhr.responseText));
+                        if (j && j.message) {
+                            messageText = j.message;
+                        }
+                    } catch (err) {
+                        /* keep fallback */
+                    }
+                    var alertBox =
+                        '<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                        messageText +
+                        "</div>";
+                    $form.find(".messages").html(alertBox);
                 }
             });
             return false;
