@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node ./node_modules/@11ty/eleventy/cmd.cjs --serve",
-    "build": "node ./node_modules/@11ty/eleventy/cmd.cjs"
+    "build": "node ./node_modules/@11ty/eleventy/cmd.cjs",
+    "normalize-links": "node scripts/normalize-internal-links.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0"

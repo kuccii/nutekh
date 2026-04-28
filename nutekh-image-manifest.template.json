@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Copy to nutekh-image-manifest.json and fill `to` paths. Use for scripted search-replace or bulk rewrites in HTML/CSS.",
+  "version": 1,
+  "replacements": [
+    {
+      "slot": "A",
+      "from": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+      "to": "assets/imgs/nutekh/slot-a.webp",
+      "notes": "Also match w=600, w=800, w=1000 variants with same photo id."
+    },
+    {
+      "slot": "B",
+      "from": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80",
+      "to": "assets/imgs/nutekh/slot-b.webp",
+      "notes": "Common variant query params; use regex or replace per unique full URL string."
+    },
+    {
+      "slot": "C",
+      "from": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
+      "to": "assets/imgs/nutekh/slot-c.webp"
+    },
+    {
+      "slot": "D",
+      "from": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&q=80",
+      "to": "assets/imgs/nutekh/slot-d.webp"
+    },
+    {
+      "slot": "E",
+      "from": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
+      "to": "assets/imgs/nutekh/slot-e.webp"
+    },
+    {
+      "slot": "F",
+      "from": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+      "to": "assets/imgs/nutekh/slot-f.webp"
+    },
+    {
+      "slot": "G",
+      "from": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80",
+      "to": "assets/imgs/nutekh/slot-g.webp"
+    },
+    {
+      "slot": "H",
+      "from": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&q=80",
+      "to": "assets/imgs/nutekh/slot-h.webp"
+    },
+    {
+      "slot": "I",
+      "from": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&q=80",
+      "to": "assets/imgs/nutekh/slot-i.webp"
+    },
+    {
+      "slot": "J",
+      "from": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&q=80",
+      "to": "assets/imgs/nutekh/slot-j.webp"
+    },
+    {
+      "slot": "K",
+      "from": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&q=80",
+      "to": "assets/imgs/nutekh/slot-k.webp"
+    },
+    {
+      "slot": "L",
+      "from": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&q=80",
+      "to": "assets/imgs/nutekh/slot-l.webp"
+    }
+  ],
+  "css_backgrounds": [
+    {
+      "from": "../imgs/map-global.png",
+      "to": "assets/imgs/map-global.png",
+      "notes": "Path in style.css is relative to CSS file; verify after build."
+    }
+  ],
+  "in_place_overwrites": [
+    {
+      "path": "assets/imgs/works/2/1.webp",
+      "notes": "Overwrite file on disk; same path used in package-*.html and portfolio templates."
+    }
+  ]
+}
