@@ -1,31 +1,62 @@
+require("dotenv").config();
+
+/** GA4 Measurement IDs look like G- followed by letters/digits (no spaces). */
+function isValidGa4MeasurementId(id) {
+  return typeof id === "string" && /^G-[A-Z0-9]+$/i.test(id.trim());
+}
+
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("assets");
   eleventyConfig.addPassthroughCopy("robots.txt");
 
   /**
    * Site-wide Google Analytics 4 (optional).
-   * Set GA_MEASUREMENT_ID (e.g. G-XXXXXXXXXX) in the environment — Vercel: Project → Settings → Environment Variables.
-   * Local: copy `.env.example` to `.env` and load before build, or export for one-off builds.
+   * Set GA_MEASUREMENT_ID (e.g. G-XXXXXXXXXX) in `.env` locally or in Vercel → Environment Variables.
+   * Build-time injection: every HTML output gets one gtag snippet before the first </head>.
    */
   eleventyConfig.addTransform("analytics-ga4", function (content, outputPath) {
     if (!outputPath || !outputPath.endsWith(".html")) {
       return content;
     }
-    const gaId = process.env.GA_MEASUREMENT_ID;
-    if (!gaId || !content.includes("</head>")) {
+    const raw = process.env.GA_MEASUREMENT_ID;
+    const gaId = raw ? String(raw).trim() : "";
+    if (!gaId) {
       return content;
     }
+    if (!isValidGa4MeasurementId(gaId)) {
+      console.warn(
+        "[analytics-ga4] GA_MEASUREMENT_ID is set but invalid; expected format G-XXXXXXXXXX. Skipping injection."
+      );
+      return content;
+    }
+
+    const closeHead = content.indexOf("</head>");
+    if (closeHead === -1) {
+      return content;
+    }
+
     const snippet = `
     <!-- GA4 (Nutekh) -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
     <script async src="https://www.googletagmanager.com/gtag/js?id=${gaId}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', '${gaId}', { send_page_view: true });
+      gtag('config', '${gaId}', {
+        send_page_view: true,
+        cookie_flags: 'SameSite=Lax;Secure'
+      });
     </script>`;
-    return content.replace("</head>", `${snippet}
-</head>`);
+
+    return (
+      content.slice(0, closeHead) +
+      snippet +
+      "\n" +
+      content.slice(closeHead)
+    );
   });
 
   // Default output: `_site/about/index.html` so URLs like `/about` work without `.html` in the browser.

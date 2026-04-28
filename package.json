@@ -9,6 +9,7 @@
     "rename-page-paths": "node scripts/replace-page-paths.mjs"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.0.0"
+    "@11ty/eleventy": "^3.0.0",
+    "dotenv": "^17.4.2"
   }
 }
