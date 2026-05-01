@@ -44,6 +44,20 @@
     "common": {
       "book_audit": "Book Free Audit"
     },
+    "chat": {
+      "toggle_aria": "Open Nutekh chat",
+      "close_aria": "Close chat",
+      "title": "Chat with Nutekh",
+      "subtitle": "We typically reply within one business day (EAT).",
+      "whatsapp_label": "WhatsApp",
+      "email_label": "Email",
+      "form_note": "Quick message — same inbox as our contact page.",
+      "name_ph": "Your name",
+      "email_ph": "Work email",
+      "subject_ph": "Topic (optional)",
+      "message_ph": "How can we help?",
+      "submit": "Send message"
+    },
     "index": {
       "tag_launch": "Launch",
       "headline_launch": "Get customers consistently",
@@ -101,6 +115,20 @@
     },
     "common": {
       "book_audit": "Weka Audit ya Bila Malipo"
+    },
+    "chat": {
+      "toggle_aria": "Fungua mazungumzo na Nutekh",
+      "close_aria": "Funga mazungumzo",
+      "title": "Ongea na Nutekh",
+      "subtitle": "Mara nyingi tunajibu ndani ya siku moja ya kazi (EAT).",
+      "whatsapp_label": "WhatsApp",
+      "email_label": "Barua pepe",
+      "form_note": "Ujumbe mfupi — unaenda katika kisanduku sawa na ukurasa wa mawasiliano.",
+      "name_ph": "Jina lako",
+      "email_ph": "Barua ya kazi",
+      "subject_ph": "Mada (si lazima)",
+      "message_ph": "Tunaweza kukusaidia vipi?",
+      "submit": "Tuma ujumbe"
     },
     "index": {
       "tag_launch": "Launch",

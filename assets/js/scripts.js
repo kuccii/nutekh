@@ -1126,7 +1126,7 @@ $(window).on("load", function () {
                 },
                 error: function (xhr) {
                     var messageText =
-                        "We could not send that just now. Please email hello@nutekh.com or WhatsApp us.";
+                        "We could not send that just now. Please email info@nutekh.com or WhatsApp us.";
                     try {
                         var j = xhr.responseJSON || (xhr.responseText && JSON.parse(xhr.responseText));
                         if (j && j.message) {
@@ -1145,6 +1145,88 @@ $(window).on("load", function () {
             return false;
         }
     });
+
+    /* Newsletter signup: footer forms posting only `subscribe` to /api/contact */
+    $(document).on(
+        "submit",
+        'form[method="post"][action="/api/contact"]:not(#contact-form)',
+        function (e) {
+            var $form = $(this);
+            if (!$form.find('input[name="subscribe"]').length) {
+                return;
+            }
+            e.preventDefault();
+
+            var raw = ($form.find('input[name="subscribe"]').val() || "").trim();
+            if (!raw) {
+                return false;
+            }
+
+            var langSw = document.documentElement.getAttribute("lang") === "sw";
+            var sending = langSw ? "Inatumwa…" : "Sending…";
+
+            var $wrap = $form.closest(".subscribe");
+            var $msg = $wrap.find(".nutekh-newsletter-msg");
+            if (!$msg.length) {
+                $msg = $(
+                    '<p class="nutekh-newsletter-msg fs-12 mt-12px mb-0 opacity-9" aria-live="polite"></p>'
+                );
+                $form.after($msg);
+            }
+            $msg.removeClass("main-color text-danger").text(sending);
+
+            var $btn = $form.find('button[type="submit"]');
+            $btn.prop("disabled", true);
+
+            var body = "subscribe=" + encodeURIComponent(raw);
+
+            fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                    Accept: "application/json",
+                },
+                body: body,
+            })
+                .then(function (r) {
+                    return r.json().then(function (j) {
+                        return { ok: r.ok && j && j.ok, j: j };
+                    });
+                })
+                .then(function (result) {
+                    if (result.ok) {
+                        $msg.addClass("main-color").removeClass("text-danger opacity-9");
+                        $msg.text(
+                            result.j && result.j.message
+                                ? result.j.message
+                                : langSw
+                                  ? "Asante — umesajili barua pepe yako kwenye orodha."
+                                  : "Thanks — you're on the list."
+                        );
+                        $form.find('input[name="subscribe"]').val("");
+                    } else {
+                        var m =
+                            (result.j && result.j.message) ||
+                            (langSw
+                                ? "Imeshindikana. Jaribu WhatsApp au barua info@nutekh.com."
+                                : "Could not subscribe. Email info@nutekh.com or try WhatsApp.");
+                        $msg.addClass("text-danger").removeClass("main-color opacity-9");
+                        $msg.text(m);
+                    }
+                })
+                .catch(function () {
+                    $msg.addClass("text-danger").removeClass("main-color opacity-9");
+                    $msg.text(
+                        langSw ? "Hitilafu ya mtandao. Jaribu tena baadae." : "Network error—try again."
+                    );
+                })
+                .finally(function () {
+                    $btn.prop("disabled", false);
+                });
+
+            return false;
+        }
+    );
 
 });
 

@@ -161,6 +161,22 @@ function applyHamenuSubLinks(dict, lang) {
   });
 }
 
+function applyI18nAttrs(dict, lang) {
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-aria");
+    if (!key) return;
+    const v = get(dict, lang, key);
+    if (v) el.setAttribute("aria-label", v);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (!key) return;
+    const v = get(dict, lang, key);
+    if (v) el.setAttribute("placeholder", v);
+  });
+}
+
 function applyDataI18n(dict, lang) {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
@@ -345,6 +361,7 @@ async function main() {
   applyHamenuFillText(dict, lang);
   applyHamenuSubLinks(dict, lang);
   applyDataI18n(dict, lang);
+  applyI18nAttrs(dict, lang);
   applyFooterBlocks(dict, lang);
   applyPageMeta(dict, lang);
   applyCircleCta(dict, lang);
