@@ -9355,6 +9355,11 @@ footer .subscribe p a {
   backdrop-filter: blur(10px);
   border-radius: 30px;
 }
+.hero-style5 .snap-slider-captions h1 span {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
 .hero-style5 .snap-slider-captions-wrapper {
   width: 100%;
   height: 90px;
@@ -10202,6 +10207,11 @@ footer .subscribe p a {
   background: rgba(187, 187, 187, 0.08);
   backdrop-filter: blur(10px);
   border-radius: 30px;
+}
+.hero-style5-showcase .snap-slider-captions h1 span {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 .hero-style5-showcase .snap-slider-captions-wrapper {
   width: 100%;
