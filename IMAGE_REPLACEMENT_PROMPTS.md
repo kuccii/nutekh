@@ -1,6 +1,6 @@
 # Nutekh — image replacement spec
 
-This file tells you **what each image is for** and gives **ready-to-paste prompts**. Copy the text inside each **fenced block** (triple backticks) straight into your image model; set aspect ratio in the tool (for example 16:9 for heroes, 1:1 for avatars).
+This file tells you **what each image is for** and gives **ready-to-paste prompts**. **Start at [By page](#by-page-start-here)** for funnel routes (each placement lists path + prompt). Copy the text inside each **fenced block** (triple backticks) into your image model; set aspect ratio in the tool (for example 16:9 for heroes, 1:1 for avatars).
 
 ---
 
@@ -35,9 +35,271 @@ Avoid: distorted hands, extra fingers, unreadable tiny UI text, glossy plastic s
 
 ---
 
-## 1. Unsplash replacements (slots A–L)
+## By page (start here)
 
-These URLs appear across **`index.html`**, **`about.html`**, **`services.html`**, **`team.html`**, **`pricing.html`**, **`contact.html`**, **`projects.html`** (case studies index), **`blog.html`**. Generate **one image per slot**, export WebP/JPEG, then replace URLs in HTML with `assets/imgs/...`.
+Work **one HTML file at a time**: each numbered item is one on-page placement. Wrap photo prompts with the [global prefix/suffix](#global-strings-paste-with-every-photo-prompt). **GEN** paths are the current Gemini exports under `assets/genimages/`; keep filenames or update HTML after export.
+
+### `index.html` (home)
+
+| # | Section | Asset (current) | Aspect |
+|---|---------|-----------------|--------|
+| 1 | Snap slider — main slide 1 | `assets/genimages/Gemini_Generated_Image_u8iaexu8iaexu8ia.png` | 16:9 |
+| 2 | Snap slider — main slide 2 | `assets/genimages/Gemini_Generated_Image_iui6luiui6luiui6.png` | 16:9 |
+| 3 | Snap slider — main slide 3 | `assets/genimages/Gemini_Generated_Image_tl2ybmtl2ybmtl2y.png` | 16:9 |
+| 4 | Snap slider — thumbnails (×3) | `14vxr714vxr714vx`, `oigliqoigliqoigl`, `8p7g0e8p7g0e8p7g` | ~4:3 / thumb |
+| 5 | Core pillars / services row (×3) | Recycle slides 4–6 filenames | Landscape |
+| 6 | Nutekh Systems — ImaliCloud | `Gemini_Generated_Image_iui6luiui6luiui6.png` | Tall panel |
+| 7 | Nutekh Systems — Heba | Unsplash `photo-1517248135467…` | Tall panel |
+| 8 | Nutekh Systems — Marketing Engine | `Gemini_Generated_Image_8p7g0e8p7g0e8p7g.png` | Tall panel |
+| 9 | Nutekh Systems — SchoolDesk | Unsplash `photo-1503676260728…` | Tall panel |
+
+**Prompts**
+
+**1 — Team / launch energy (main slide 1)**
+
+```
+Wide shot inside a bright modern office in East Africa: three or four professionals gathered around one laptop on a table, mid-conversation, genuine expressions. Place the group slightly off-center; leave one third of the frame as softer background (wall or window) so a designer can add dark gradient and text. Natural daylight from the side, shallow depth of field (background gently blurred). Documentary feel, not posed advertising. No visible screen text, no brand logos.
+```
+
+**2 — Multi-screen dashboards & operations (main slide 2)**
+
+```
+Desk-level view of multiple devices suggesting automation: laptop with abstract dashboard (blurred shapes only), optional second screen, maybe a phone showing notification icons without readable text. Cool blue-gray palette, crisp and modern. High clarity, low clutter. Reserve a band of darker negative space along top or bottom for dark overlay.
+```
+
+**3 — Connected systems / scale (main slide 3)**
+
+```
+Abstract tech illustration OR soft 3D: floating generic app icons (squares, circles) connected by thin curved lines, like a network. Very subtle silhouette of the African continent or East Africa as a faint map watermark—optional and understated. Deep navy to teal gradient background, minimal, no text. Style: clean vector-like or soft 3D, not noisy sci-fi wires everywhere.
+```
+
+**4a — Workshop / discovery thumb**
+
+```
+Small team stand-up near a whiteboard with a few sticky notes (no readable writing). Mix of ages, casual-smart clothes, East African office. Warm indoor light, energetic but not chaotic. Camera at eye level, slightly wide lens. Keep bottom third slightly calmer for caption area.
+```
+
+**4b — Engineering / IDE (thumb)**
+
+```
+Close-up shot: hands on a laptop keyboard, screen visible but charts and numbers blurred so nothing is readable. Cool-neutral color grade (slight teal/blue in shadows), trustworthy calm mood. Desk is tidy: notebook edge, phone face-down. Leave upper area slightly darker for overlay text. Office window bokeh optional. Sharp focus on hands and keyboard; no face required.
+```
+
+**4c — Analytics / growth (thumb)**
+
+```
+Medium shot: a business owner or manager at a clean desk looking at a laptop showing a simple line chart (blurred, no readable labels). A smartphone lies beside the laptop. Expression is thoughtful and optimistic. Soft daylight, warm-neutral palette. Background is a plain wall or soft office blur—uncluttered. Space in the top or left third for UI overlay if needed.
+```
+
+**7 — Heba (hospitality / restaurant ops)** — replace Unsplash with a local file when ready
+
+```
+Warm interior of a contemporary East African restaurant or café during service: dining tables, soft lighting, staff in the mid-ground slightly blurred, no readable menus or brand logos. Inviting, busy but organized. Landscape 16:9 or vertical crop compatible with tall case-study tiles. Leave one side softer for overlays.
+```
+
+**9 — SchoolDesk (education)**
+
+```
+Bright modern classroom or computer lab in East Africa: students at desks or laptops, teacher or facilitator in background blurred, daylight, respectful documentary tone. No readable writing on boards. Landscape source suitable for tall gallery crop. Positive, orderly learning environment.
+```
+
+---
+
+### `about.html`
+
+| # | Section | Asset (current) |
+|---|---------|----------------|
+| 1 | Intro parallax — large panel | `Gemini_Generated_Image_u8iaexu8iaexu8ia.png` |
+| 2 | Intro parallax — inset | `Gemini_Generated_Image_14vxr714vxr714vx.png` |
+| 3–6 | Hover-reveal pillars (×4) | `14vxr7`, `8p7g0e`, `oigliqo`, `iui6lui` |
+| 7 | Full-width parallax strip | `Gemini_Generated_Image_iui6luiui6luiui6.png` |
+| 8–9 | intro-style tiles | `iui6lui`, `tl2yb` |
+| A–D | Client testimonial avatars | Unsplash **K, L, H, I** order in layout (prompts under **Reference slots H–L**). |
+
+**Prompts** — **1** = **`index`** item **1**; **2** = **`index`** **4a**; **3–6** (pillars left → right): **4a**, **4c**, **4b**, **2** matching filenames `14vxr7`, `8p7g0e`, `oigliqo`, `iui6lui`; **7** = **`index`** **2**; **8–9** = **`index`** **2**, **3**; avatars use **K, L, H, I** slot prompts.
+
+---
+
+### `services.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1–2 | Featured quote avatars | Unsplash photo-150700…, photo-149479… (**slots H / I**) |
+| 3–6 | Interactive tab thumbnails | `14vxr7`, `iui6lui`, `oigliqo`, `tl2yb` |
+| 7–10 | Stacking cards (Launch → Marketing Engine) | `u8iaex`, `iui6lui`, `tl2yb`, `8p7g0e` |
+
+**Prompts** — Tab thumb order (**3–6**): **`index`** prompts **4a, 2, 4b, 3**. Stacking cards (**7–10**): **`index`** **1, 2, 3, 4c**.
+
+---
+
+### `projects.html` (Nutekh Systems gallery)
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Page hero background | `Gemini_Generated_Image_tl2ybmtl2ybmtl2y.png` |
+| 2–5 | Case study tiles | ImaliCloud `iui6lui`; Heba Unsplash; Marketing `8p7g0e`; SchoolDesk Unsplash |
+
+**Prompts** — Same as **`index.html` items 3, 2, 7 (Heba prompt), 4c, 9 (SchoolDesk prompt)**.
+
+---
+
+### `marketing-engine.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Floating deco | `assets/imgs/intro/02.png` (prompt under **§ 10** → `intro/02` in this file) |
+| 2 | Split hero backdrop | `Gemini_Generated_Image_8p7g0e8p7g0e8p7g.png` |
+| 3–10 | Capability / “works” imagery | `assets/imgs/works/w1.png` … `w7.png`, testimonials, `serv/s1–s4.jpg`, etc. |
+
+**Prompt — hero (item 2)** — reuse **`index` prompt 4c** or the **`m.jpg`** block under **§ 6 Hero folder** below for a darker full-bleed variant.
+
+**Items 3+** — follow **§ 7** → **Marketing Engine cards** (`works/w1.png`–`w7.png`) and **`serv/s1–s4`** for hover panels.
+
+---
+
+### `imalicloud.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Hero / lead image | `Gemini_Generated_Image_iui6luiui6luiui6.png` |
+
+**Prompt** — **`index.html` item 2** (dashboard / multi-device operations).
+
+---
+
+### `heba.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Hero image | Unsplash dining photo (replace with local) |
+
+**Prompt** — same as **`index.html` item 7 (Heba / hospitality)**.
+
+---
+
+### `schooldesk.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Hero image | Unsplash classroom (replace with local) |
+
+**Prompt** — same as **`index.html` item 9 (SchoolDesk)**.
+
+---
+
+### `package-launch.html`, `package-grow.html`, `package-scale.html`
+
+| # | Section | Assets (shared across all three) |
+|---|---------|--------------------------------|
+| S1–S6 | Full-bleed swiper slides | `assets/imgs/works/2/1.webp`, `13.webp`, `9.webp`, `4.webp`, `11.webp`, `12.webp` |
+
+**Prompts** — See **§ 7** in this file, **`works/2/*`** (`1.webp`, `13`, `9`, `4`, `11`, `12`). Optional: vary slides per package by assigning different filenames in HTML after regenerating variants.
+
+Intro strip (`package-launch.html` top): `assets/imgs/intro/02.png` (prompt **§ 10**, `intro/02`).
+
+---
+
+### `contact.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Parallax hero | Unsplash `photo-1499951360447-c576922fc831…` |
+
+**Prompt**
+
+```
+Wide overhead or 45-degree shot of creative desk: laptops, notebooks, pens, coffee, plants—organized minimal composition. Neutral-warm daylight, shallow depth of field, no readable text or logos; leave upper or side area softer for typography overlay.
+```
+
+---
+
+### `pricing.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Hero parallax | Unsplash dashboards `photo-1551288049-bebda4e38f71…` (**slot F**) |
+| 2–3 | Content images | Same F URL; analytics `photo-1460925895917…` (**slot C**) |
+| 4–5 | Small avatars | **slots H, I** |
+
+**Prompts** — Slots **F**, **C**, **H**, **I** in **Reference — Unsplash slots** (below).
+
+---
+
+### `team.html`
+
+| # | Section | Asset |
+|---|---------|--------|
+| 1 | Hero | Unsplash `photo-1522071820081…` (**slot B**) |
+| 2–7 | Grid portraits | photos **150700…**, **149479010…**, **150064876…**, **147209964…**, **143876168…**, repeat (**slots H,I,J,K,L,I**) |
+| 8–9 | Large feature images | dashboards F; laptop growth C |
+
+**Prompts** — Use **slots B, C, F** and **H–L** in **Reference — Unsplash slots** (below).
+
+---
+
+### `blog.html`
+
+| # | Section | Assets / idea |
+|---|---------|---------------|
+| 1–8 | Featured and list thumbnails | Rotate **slots C**, **F**, **G**, **B** (analytics, dashboards, integrations, keyboards) |
+
+**Prompts**
+
+```
+Growth & dashboards (slot C):
+
+Medium shot: a business owner or manager at a clean desk looking at a laptop showing a simple line chart (blurred, no readable labels). A smartphone lies beside the laptop. Expression is thoughtful and optimistic. Soft daylight, warm-neutral palette. Background is a plain wall or soft office blur—uncluttered. Space in the top or left third for UI overlay if needed.
+```
+
+Alternate cards with **slot F**, **G**, **B** blocks in **Reference — Unsplash slots** (below).
+
+---
+
+### `blog-details.html`
+
+| # | Section | Asset hints |
+|---|---------|--------------|
+| 1–3 | Typical article hero/supporting | `@assets/imgs/blog/*.webp`, `avatar.jpg`, etc. |
+
+**Prompts** — See **§ 9** (`blog/` assets) in this file.
+
+---
+
+### `home-main.html` (theme alternate home)
+
+Heavy use of `works/*`, `serv/*`, `team/*`, `testim/*`, `awards/*`, `blog/b*`. Match each `/img` URL to prompts in **§ 7**, **§ 8**, **§ 9**, and **§ 10** in this file (`works`, `serv`, `team`/testimonials/blog, intros/shapes).
+
+---
+
+### `faqs.html`
+
+| Section | Paths |
+|---------|-------|
+| Hero | `assets/imgs/intro/h7.png` |
+| deco | `mshap3.png` |
+| side blocks | `intro/01.png`, `intro/h3.jpg` |
+
+**Prompts** — **`intro/h7.png`**, **`intro/01.png`**, **`intro/h3.jpg`**, and **`mshap3.png`** specs live under **§ 10**.
+
+---
+
+### Cross-page checklist (Unsplash IDs still hooked in HTML)
+
+| Slot | Unsplash `photo-*` shortcut | Seen on (examples) |
+|------|-----------------------------|---------------------|
+| C | `-1460925895917…` | `blog`, `pricing`, `team`, `marketing-engine` imagery elsewhere |
+| F | `-1551288049…` | `pricing`, `team`, `blog` |
+| G | `-1551434678…` | `blog` |
+| B | `-1522071820081…`, `-1521737604893…` | `team` hero variant |
+| H–L | avatar IDs above | `about`, `services`, `pricing`, `team` |
+
+Generate once per slot, export to `assets/imgs/`, then swap URLs in HTML. **GEN** placements already satisfy many funnel roles; regenerate only where you want a new look.
+
+---
+
+## Reference — Unsplash slots (A–L)
+
+Use **one export per slot** for every remaining remote URL pointing at that photo. Prefer replacing with local files under `assets/imgs/` and updating markup.
 
 **Unsplash ID → slot**
 
@@ -133,7 +395,7 @@ Abstract tech illustration OR soft 3D: floating generic app icons (squares, circ
 
 ---
 
-### Slots H, I, J, K, L — Headshots (avatars, team, testimonials)
+### Reference slots H, I, J, K, L — Headshots
 
 **Common rules for all:** Square output **1024×1024** (or 800×800), **centered face**, **neutral gray or warm off-white background**, **softbox-style light** from front-left, **business casual**, **direct or slight 3/4 gaze**, **no ID badges, no text**.
 
@@ -541,10 +803,11 @@ Four fake company wordmarks as simple geometric monograms (A, N, M, K style shap
 
 ## 12. Coverage checklist
 
-- [ ] Generate slots **A–L** and replace Unsplash URLs.  
-- [ ] Generate **`works/2`** set for package + portfolio pages.  
-- [ ] **`marketing-engine.html`**: `m.jpg`, `w1–w7`, `s1–s4`, `w8.mp4`, headshots, team.  
-- [ ] **`index.html`**: hero images + `mshap1.png` (see shapes).  
+- [ ] Follow **[By page](#by-page-start-here)** for each funnel route (GEN paths + prompts).  
+- [ ] Finish **remaining Unsplash URLs** via **Reference — Unsplash slots (A–L)**.  
+- [ ] Generate **`works/2`** set for package slides + portfolio demos.  
+- [ ] **`marketing-engine.html`**: hero GEN or `m.jpg`; `works/w1–w7`; `serv/s1–s4`; `w8.mp4`; testimonials, team assets.  
+- [ ] **`index.html`**, **`projects.html`**: systems tiles until `Heba` / `SchoolDesk` are local.  
 - [ ] **CSS**: `map-global`, `hero/md`, intro shapes.  
 - [ ] **Favicons** from vector master.  
 - [ ] **Clutch / Envato / Trustpilot** SVGs replaced.
@@ -557,7 +820,7 @@ The prompts do not change the site until you **export files** and **update refer
 
 | Step | What to do | Why it matters |
 |------|------------|----------------|
-| **1** | Generate **slots A–L** (section 1) → save under e.g. `assets/imgs/nutekh/slots/` | One batch removes **remote Unsplash** dependence on the main funnel pages. |
+| **1** | Generate **slots A–L** (see **Reference — Unsplash slots** below) → save under e.g. `assets/imgs/nutekh/slots/` | One batch removes **remote Unsplash** on pages still hotlinking. |
 | **2** | Replace `https://images.unsplash.com/...` in HTML with local paths (or run a script from `nutekh-image-manifest.template.json`) | Faster loads, consistent branding, no hotlink breakage. |
 | **3** | Generate **`works/2/*`** slide set → overwrite `assets/imgs/works/2/` (same filenames) | **Package** pages (`package-*.html`) and **portfolio** demos update together. |
 | **4** | **`marketing-engine.html`** + **`index.html`**: hero, panels, testimonials | Highest visible Nutekh story. |
@@ -596,7 +859,7 @@ Get-ChildItem -Path . -Recurse -File -Include *.html | Select-String -Pattern 'i
 Select-String -Path 'assets\css\style.css' -Pattern 'url\('
 ```
 
-**Funnel pages to eyeball first:** `index.html`, `services.html`, `about.html`, `contact.html`, `marketing-engine.html`, `package-launch.html`, `package-grow.html`, `package-scale.html`, `pricing.html`.
+**Funnel pages to eyeball first:** `index.html`, `services.html`, `about.html`, `projects.html`, `contact.html`, `marketing-engine.html`, `imalicloud.html`, `heba.html`, `schooldesk.html`, `package-launch.html`, `package-grow.html`, `package-scale.html`, `pricing.html`.
 
 ---
 
@@ -608,5 +871,5 @@ The template documents **`from` → `to`** pairs so you are not relying on memor
 
 ---
 
-*To extend prompt text: search for `assets/imgs/` and add subsections with the same structure as above.*
+*To add new assets: use **By page** above for HTML placements, or search for `assets/imgs/` / `assets/genimages/` and align with the appendix sections (§2 onward).*
  
