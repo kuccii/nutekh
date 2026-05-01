@@ -59,6 +59,28 @@ module.exports = function (eleventyConfig) {
     );
   });
 
+  /**
+   * Kiswahili / English switching (Nutekh): ES module runs with top-level await before later scripts bundle.
+   */
+  eleventyConfig.addTransform("nutekh-i18n-module", function (content, outputPath) {
+    if (!outputPath || !outputPath.endsWith(".html")) return content;
+    if (content.includes("nutekh-i18n.js")) return content;
+
+    const tag =
+      '\n<script type="module" src="/assets/js/nutekh-i18n.js"></script>\n';
+
+    const jq = '<script src="assets/js/jquery-3.6.0.min.js"';
+    const jqui = '<script src="assets/js/jquery-3.7.1.min.js"';
+    const insertAt =
+      content.indexOf(jq) !== -1
+        ? content.indexOf(jq)
+        : content.indexOf(jqui) !== -1
+          ? content.indexOf(jqui)
+          : content.lastIndexOf("</body>");
+    if (insertAt === -1) return content;
+    return content.slice(0, insertAt) + tag + content.slice(insertAt);
+  });
+
   // Default output: `_site/about/index.html` so URLs like `/about` work without `.html` in the browser.
 
   return {

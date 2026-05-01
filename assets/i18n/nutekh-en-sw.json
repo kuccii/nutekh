@@ -1,0 +1,171 @@
+{
+  "en": {
+    "nav": {
+      "home": "Home",
+      "about": "About Us",
+      "services": "Services",
+      "systems": "Systems",
+      "contact": "Contact Us",
+      "pages": "Pages",
+      "packages": "Packages",
+      "pricing_nav": "Pricing",
+      "our_services": "Our Services",
+      "pricing_overview": "Pricing Overview",
+      "launch_pkg": "Launch Package",
+      "grow_pkg": "Grow Package",
+      "scale_pkg": "Scale Package"
+    },
+    "lang_toggle": {
+      "english": "English",
+      "swahili": "Kiswahili",
+      "aria": "Choose site language",
+      "title_en": "Use English throughout the site",
+      "title_sw": "Tumia Kiswahili tovuti nzima"
+    },
+    "footer": {
+      "tagline_left": ". East Africa Focused",
+      "tagline_right": ". Practical Digital Growth",
+      "ready_prefix": "Ready to",
+      "ready_suffix": "Grow with Nutekh?",
+      "audit_btn": "Book a Free 30-Minute Digital Audit",
+      "blurb_line1": "Helping East African teams",
+      "blurb_line2": "get customers and run faster.",
+      "packages_link": "Launch / Grow / Scale",
+      "systems_link": "Nutekh Systems",
+      "why_link": "Why Nutekh",
+      "contact_link": "Contact",
+      "talk_line1": "Talk to",
+      "talk_line2": "Nutekh",
+      "newsletter_label": "Growth Newsletter",
+      "newsletter_placeholder": "Email for practical growth insights",
+      "next_slide": "Next Slide",
+      "prev_slide": "Prev Slide"
+    },
+    "common": {
+      "book_audit": "Book Free Audit"
+    },
+    "index": {
+      "tag_launch": "Launch",
+      "headline_launch": "Get customers consistently",
+      "tag_grow": "Grow",
+      "headline_grow": "Run operations faster",
+      "tag_scale": "Scale",
+      "headline_scale": "Connect systems & measure growth",
+      "why_heading": "Why Nutekh",
+      "systems_heading": "Nutekh Systems",
+      "circlecta": "See Nutekh Systems - See Nutekh Systems -"
+    },
+    "pages_meta": {}
+  },
+  "sw": {
+    "nav": {
+      "home": "Nyumbani",
+      "about": "Kuhusu Sisi",
+      "services": "Huduma",
+      "systems": "Mifumo",
+      "contact": "Wasiliana",
+      "pages": "Kurasa",
+      "packages": "Vifurushi",
+      "pricing_nav": "Bei",
+      "our_services": "Huduma Zetu",
+      "pricing_overview": "Muhtasari wa Bei",
+      "launch_pkg": "Kifurushi Launch",
+      "grow_pkg": "Kifurushi Grow",
+      "scale_pkg": "Kifurushi Scale"
+    },
+    "lang_toggle": {
+      "english": "English",
+      "swahili": "Kiswahili",
+      "aria": "Chagua lugha ya tovuti",
+      "title_en": "Tumia lugha ya Kiingereza tovuti nzima",
+      "title_sw": "Tumia Kiswahili tovuti nzima"
+    },
+    "footer": {
+      "tagline_left": ". Linalenga Afrika Mashariki",
+      "tagline_right": ". Ukuaji Wenye Mantiki",
+      "ready_prefix": "Je, uko tayari",
+      "ready_suffix": "kukua na Nutekh?",
+      "audit_btn": "Weka Audit ya Bila Malipo Dakika 30",
+      "blurb_line1": "Kusaidia timu za Afrika Mashariki",
+      "blurb_line2": "kupata wateja na kuendesha haraka.",
+      "packages_link": "Launch / Grow / Scale",
+      "systems_link": "Mifumo ya Nutekh",
+      "why_link": "Kwa Nini Nutekh",
+      "contact_link": "Wasiliana",
+      "talk_line1": "Ongea na",
+      "talk_line2": "Nutekh",
+      "newsletter_label": "Jarida la Ukuaji",
+      "newsletter_placeholder": "Barua pepe kwa mawazo yenye mwafaka ya ukuaji",
+      "next_slide": "Kijacho",
+      "prev_slide": "Kilichotangulia"
+    },
+    "common": {
+      "book_audit": "Weka Audit ya Bila Malipo"
+    },
+    "index": {
+      "tag_launch": "Launch",
+      "headline_launch": "Pata wateja kwa uthabiti",
+      "tag_grow": "Grow",
+      "headline_grow": "Endesha shughuli kwa kasi zaidi",
+      "tag_scale": "Scale",
+      "headline_scale": "Unganisha mifumo na pima ukuaji",
+      "why_heading": "Kwa Nini Nutekh",
+      "systems_heading": "Mifumo ya Nutekh",
+      "circlecta": "Tazama mifumo ya Nutekh - Tazama mifumo ya Nutekh -"
+    },
+    "pages_meta": {
+      "/": {
+        "title": "Nutekh — Mifumo dijiti yenye mwafaka kwa Afrika Mashariki",
+        "description": "Nutekh husaidia biashara za Afrika Mashariki kukua kwa ImaliCloud ERP, mfumo wa Heba, Marketing Engine na SchoolDesk—pamoja na utekelezaji Launch, Grow & Scale kutoka Dar es Salaam."
+      },
+      "/about": {
+        "title": "Kuhusu Nutekh — Mifumo na Utekelezaji kwa Afrika Mashariki",
+        "description": "Nutekh inauza na kutekeleza mifumo maalum—ImaliCloud, Heba, Marketing Engine, SchoolDesk—pamoja na miradi ya Launch, Grow na Scale kwa timu za Afrika Mashariki."
+      },
+      "/services": {
+        "title": "Huduma za Nutekh — Launch, Grow & Scale",
+        "description": "Mpango wako wa ukuaji dijiti: Launch, Grow na Scale—kutoka tovuti na matangazo hadi mifumo iliyounganishwa na dashibodi."
+      },
+      "/projects": {
+        "title": "Mifumo ya Nutekh — ImaliCloud, Heba, Marketing Engine, SchoolDesk",
+        "description": "Soma mifumo ya Nutekh: ImaliCloud ERP, Heba kwa ukahawa, Marketing Engine na SchoolDesk—na jinsi zinavyounganishwa na utoaji wa Nutekh."
+      },
+      "/contact": {
+        "title": "Wasiliana na Nutekh — Audit ya Bila Malipo",
+        "description": "Wasiliana na Nutekh Dar es Salaam—weka audit ya bila malipo dakika 30, uliza kuhusu ImaliCloud na Heba, au ongea Launch, Grow na Scale."
+      },
+      "/marketing-engine": {
+        "title": "Nutekh — Marketing Engine",
+        "description": "Marketing Engine ya Nutekh: SEO ya ndani, matangazo yaliyolipwa, ufuatiliaji upya, ujumbe wa WhatsApp na barua pepe — na ripoti za KPI kila wiki."
+      },
+      "/pricing": {
+        "title": "Bei — Nutekh",
+        "description": "Muhtasari wa bei za vifurushi na utekelezaji wa mifumo ya Nutekh kwa timu za Afrika Mashariki."
+      },
+      "/imalicloud": {
+        "title": "Nutekh — ImaliCloud (ERP ya wingu)",
+        "description": "ImaliCloud: ERP ya wingu ya Nutekh kwa Afrika Mashariki—akaunti, ununuzi, hesabu ya hisa, ripoti za matawi na utekelezaji wa awamu."
+      },
+      "/heba": {
+        "title": "Nutekh — Heba",
+        "description": "Heba: mfumo wa ukahawa na POS uliotekelezwa na Nutekh kwa operesheni za kisasa."
+      },
+      "/schooldesk": {
+        "title": "Nutekh — SchoolDesk",
+        "description": "SchoolDesk: simu ya shule na uongozi wa mafunzo iliyotekelezwa na Nutekh."
+      },
+      "/package-launch": {
+        "title": "Nutekh — Kifurushi Launch",
+        "description": "Kifurushi Launch: panua haraka ulimwengu wako dijiti kwa tovuti, Google na mtiririko wa WhatsApp."
+      },
+      "/package-grow": {
+        "title": "Nutekh — Kifurushi Grow",
+        "description": "Kifurushi Grow: jenga mtiririko thabiti wa wateja uliowezekana na CRM na matangazo."
+      },
+      "/package-scale": {
+        "title": "Nutekh — Kifurushi Scale",
+        "description": "Kifurushi Scale: panua kwa mifumo iliyounganishwa na dashibodi za KPI."
+      }
+    }
+  }
+}
