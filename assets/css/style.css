@@ -19,7 +19,7 @@ html {
 }
 
 body {
-  font-family: "Funnel Display", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 16px;
   line-height: 1.2;
   font-weight: 400;
@@ -34,7 +34,7 @@ body.modern-agency .section-padding {
   padding: 80px 40px;
 }
 body.home-main, body.design-studio {
-  font-family: "Mona Sans", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 body.home-personal .container {
   max-width: 1320px;
@@ -90,11 +90,11 @@ body .blur-div {
 }
 
 .mozilla-font {
-  font-family: "Mozilla Text", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .handjet-font {
-  font-family: "Handjet", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .bg-light {
@@ -8224,7 +8224,7 @@ body.light .theme-icon .moon {
   border-radius: 150px;
 }
 .skills .item-skill h2 {
-  font-family: "Mozilla Text", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .scrolling-marq .marq-box .item {
