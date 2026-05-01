@@ -7608,6 +7608,22 @@ body.loaded {
 }
 .navbar .logo {
   position: relative;
+  width: 140px !important;
+  max-width: none;
+  flex-shrink: 0;
+}
+.navbar .logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.footer-style1 .f-logo.w-150px {
+  width: 185px !important;
+}
+.footer-style1 .f-logo.w-150px img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 .navbar .menu-icon {
   padding: 25px 30px;
@@ -11497,7 +11513,8 @@ body.light footer .main-color {
     padding: 20px 10px !important;
   }
   .navbar .logo {
-    max-width: 80px !important;
+    width: 120px !important;
+    max-width: 120px !important;
     margin-left: 30px;
   }
   .navbar .navbar-collapse {
