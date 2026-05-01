@@ -7282,9 +7282,9 @@ body.loaded {
 }
 
 .loader-wrap .loader-wrap-heading .load-text {
-  font-size: 60px;
+  font-size: clamp(52px, 15vw, 130px);
   font-weight: 200;
-  letter-spacing: 5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   z-index: 20;
 }
@@ -11963,9 +11963,6 @@ body.light footer .main-color {
   }
   .progress-wrap {
     display: none;
-  }
-  .loader-wrap .loader-wrap-heading .load-text {
-    font-size: 20px;
   }
   .hamenu .logo {
     left: 25px;
