@@ -7608,7 +7608,7 @@ body.loaded {
 }
 .navbar .logo {
   position: relative;
-  width: 140px !important;
+  width: 100px !important;
   max-width: none;
   flex-shrink: 0;
 }
@@ -8143,6 +8143,37 @@ body.light .theme-icon .moon {
   background: #fff;
   border-radius: 50%;
   margin-right: 15px;
+}
+
+/* Home · VUKA block — stack headline so long title is not squeezed */
+.nutekh-vuka-h2 {
+  font-weight: 600;
+  max-width: 100%;
+  hyphens: manual;
+  overflow-wrap: break-word;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em;
+}
+.nutekh-vuka-h2 .nutekh-vuka-eyebrow {
+  display: inline-block;
+  letter-spacing: 0.06em;
+}
+.nutekh-vuka-h2 .nutekh-vuka-head-main {
+  display: block;
+  margin-top: 0.06em;
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+@media (max-width: 991px) {
+  .nutekh-vuka-h2 {
+    font-size: 44px !important;
+  }
+}
+@media (max-width: 575px) {
+  .nutekh-vuka-h2 {
+    font-size: 34px !important;
+  }
 }
 
 .intro-style3 .bord {
@@ -9359,6 +9390,7 @@ footer .subscribe p a {
 }
 .hero-style5 .snap-slider-captions h1 {
   font-size: 64px;
+  line-height: 1.15;
 }
 .hero-style5 .snap-slider-captions span {
   font-size: 18px;
@@ -9378,10 +9410,16 @@ footer .subscribe p a {
 }
 .hero-style5 .snap-slider-captions-wrapper {
   width: 100%;
-  height: 90px;
+  overflow: hidden;
   display: block;
   position: relative;
-  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.hero-style5 .snap-slider-captions-track {
+  width: 100%;
+  display: block;
+  will-change: transform;
 }
 .hero-style5.shwocase .snap-slider-captions {
   align-items: end;
@@ -10212,6 +10250,7 @@ footer .subscribe p a {
 }
 .hero-style5-showcase .snap-slider-captions h1 {
   font-size: 64px;
+  line-height: 1.15;
 }
 .hero-style5-showcase .snap-slider-captions span {
   font-size: 18px;
@@ -10231,10 +10270,16 @@ footer .subscribe p a {
 }
 .hero-style5-showcase .snap-slider-captions-wrapper {
   width: 100%;
-  height: 90px;
+  overflow: hidden;
   display: block;
   position: relative;
-  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.hero-style5-showcase .snap-slider-captions-track {
+  width: 100%;
+  display: block;
+  will-change: transform;
 }
 
 .inter-links-center {
@@ -11513,8 +11558,8 @@ body.light footer .main-color {
     padding: 20px 10px !important;
   }
   .navbar .logo {
-    width: 120px !important;
-    max-width: 120px !important;
+    width: 80px !important;
+    max-width: 80px !important;
     margin-left: 30px;
   }
   .navbar .navbar-collapse {
@@ -11686,17 +11731,21 @@ body.light footer .main-color {
   }
   .hero-style5 .snap-slider-captions-wrapper,
   .hero-style5-showcase .snap-slider-captions-wrapper {
-    height: 60px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
   .hero-style5 .snap-slider-captions h1,
   .hero-style5-showcase .snap-slider-captions h1 {
-    font-size: 40px;
+    font-size: 32px;
+    line-height: 1.2;
     text-align: center;
   }
   .hero-style5 .snap-slider-captions,
   .hero-style5-showcase .snap-slider-captions {
     align-items: flex-end;
     padding-bottom: 100px;
+    overflow: visible;
   }
   .hero-style5 .mdtop {
     position: static !important;
@@ -12083,7 +12132,8 @@ body.light footer .main-color {
   }
   .hero-style5 .snap-slider-captions-wrapper,
   .hero-style5-showcase .snap-slider-captions-wrapper {
-    height: 120px;
+    /* Slide height applied by ShowcaseSnapSlider (inline) for reel mask */
+    min-height: 3rem;
   }
   .hero-style5 .snap-slider-captions,
   .hero-style5-showcase .snap-slider-captions {

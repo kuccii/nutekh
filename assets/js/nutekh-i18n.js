@@ -175,6 +175,23 @@ function applyI18nAttrs(dict, lang) {
     const v = get(dict, lang, key);
     if (v) el.setAttribute("placeholder", v);
   });
+
+  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-title");
+    if (!key) return;
+    const v = get(dict, lang, key);
+    if (v) el.setAttribute("title", v);
+  });
+}
+
+/** Trusted CMS-style copy only (Nutekh JSON — no user input). */
+function applyDataI18nHtml(dict, lang) {
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-html");
+    if (!key) return;
+    const v = get(dict, lang, key);
+    if (v) el.innerHTML = v;
+  });
 }
 
 function applyDataI18n(dict, lang) {
@@ -186,11 +203,32 @@ function applyDataI18n(dict, lang) {
   });
 }
 
+function applyCommonUi(dict, lang) {
+  const c = dict[lang]?.common;
+  if (!c) return;
+
+  if (c.nav_toggle_aria) {
+    document.querySelectorAll(".navbar-toggler").forEach((btn) => {
+      btn.setAttribute("aria-label", c.nav_toggle_aria);
+    });
+  }
+
+  if (c.theme_toggle_title) {
+    document.querySelectorAll(".theme-icon [title]").forEach((ico) => {
+      ico.setAttribute("title", c.theme_toggle_title);
+    });
+  }
+}
+
 function applyFooterBlocks(dict, lang) {
   const f = dict[lang]?.footer;
   if (!f) return;
 
+  const path = normalizePathname();
+
   document.querySelectorAll("footer.footer-style1").forEach((footer) => {
+    const cf = path === "/contact" ? dict[lang]?.contact?.contact_footer : null;
+
     const bar = footer.querySelector(".col-12 .line-bottom");
     if (bar) {
       const spans = bar.querySelectorAll(".opacity-7");
@@ -199,7 +237,15 @@ function applyFooterBlocks(dict, lang) {
     }
 
     const h2 = footer.querySelector(".fo-box-left h2");
-    if (h2 && f.ready_prefix && f.ready_suffix) {
+    if (cf && h2 && cf.ready_prefix && cf.ready_suffix) {
+      h2.textContent = "";
+      const s1 = document.createElement("span");
+      s1.className = "opacity-7";
+      s1.textContent = cf.ready_prefix;
+      h2.appendChild(s1);
+      h2.appendChild(document.createElement("br"));
+      h2.appendChild(document.createTextNode(cf.ready_suffix));
+    } else if (path !== "/contact" && h2 && f.ready_prefix && f.ready_suffix) {
       h2.textContent = "";
       const s1 = document.createElement("span");
       s1.className = "opacity-7";
@@ -210,7 +256,10 @@ function applyFooterBlocks(dict, lang) {
     }
 
     const cap = footer.querySelector(".butn-arrow .text-uppercase");
-    if (cap && f.audit_btn) cap.textContent = f.audit_btn;
+    if (cap) {
+      if (cf?.cta_btn) cap.textContent = cf.cta_btn;
+      else if (path !== "/contact" && f.audit_btn) cap.textContent = f.audit_btn;
+    }
 
     const blurb = footer.querySelector(".fo-box-left .f-logo + p");
     if (blurb && f.blurb_line1 && f.blurb_line2) {
@@ -265,6 +314,15 @@ function applyPageMeta(dict, lang) {
   if (block.description) {
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", block.description);
+  }
+  if (block.keywords) {
+    let kw = document.querySelector('meta[name="keywords"]');
+    if (!kw) {
+      kw = document.createElement("meta");
+      kw.setAttribute("name", "keywords");
+      document.head.appendChild(kw);
+    }
+    kw.setAttribute("content", block.keywords);
   }
 }
 
@@ -360,12 +418,26 @@ async function main() {
   applyStandardNav(dict, lang);
   applyHamenuFillText(dict, lang);
   applyHamenuSubLinks(dict, lang);
+  applyCommonUi(dict, lang);
   applyDataI18n(dict, lang);
+  applyDataI18nHtml(dict, lang);
   applyI18nAttrs(dict, lang);
   applyFooterBlocks(dict, lang);
   applyPageMeta(dict, lang);
   applyCircleCta(dict, lang);
   mountLangSwitch(dict, lang);
+
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".snap-slider-captions-wrapper").forEach((wrap) => {
+      const caps = wrap.querySelectorAll(".snap-slide-caption");
+      let maskH = 0;
+      caps.forEach((c) => {
+        maskH = Math.max(maskH, c.offsetHeight || 0);
+      });
+      if (maskH > 0) wrap.style.height = maskH + "px";
+    });
+    if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
+  });
 }
 
 await main();

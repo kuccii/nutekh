@@ -202,13 +202,38 @@ $(function () {
         if (!$holder.length) return;
 
         const holder = document.querySelector(".ui-snap-slider"),
-            slides = gsap.utils.toArray(".snap-slide"),
-            thumbsWrapper = document.querySelector(".snap-slider-thumbs"),
-            snapCaptionWrapper = document.querySelector(".snap-slider-captions"),
-            snapCaptions = gsap.utils.toArray(".snap-slide-caption"),
-            thumbs = gsap.utils.toArray(".thumb-slide"),
-            thumbsImg = gsap.utils.toArray(".thumb-slide img"),
+            slides = gsap.utils.toArray(holder.querySelectorAll(".snap-slide")),
+            thumbsWrapper = holder.querySelector(".snap-slider-thumbs"),
+            snapCaptionWrapper = holder.querySelector(".snap-slider-captions"),
+            captionWrap = holder.querySelector(".snap-slider-captions-wrapper"),
+            captionTrack = holder.querySelector(".snap-slider-captions-track"),
+            snapCaptions = gsap.utils.toArray(holder.querySelectorAll(".snap-slide-caption")),
+            thumbs = gsap.utils.toArray(holder.querySelectorAll(".thumb-slide")),
+            thumbsImg = gsap.utils.toArray(holder.querySelectorAll(".thumb-slide img")),
             vh = window.innerHeight;
+
+        /** Clipping window = tallest caption so reels show one headline at a time. */
+        function syncHeroCaptionMaskHeight() {
+            if (!captionWrap || !snapCaptions.length) return;
+            let maskH = 0;
+            snapCaptions.forEach((el) => {
+                maskH = Math.max(maskH, el.offsetHeight || 0);
+            });
+            if (maskH > 0) captionWrap.style.height = maskH + "px";
+        }
+
+        function captionStackTravelPx() {
+            let dist = 0;
+            for (let i = 0; i < snapCaptions.length - 1; i++) {
+                dist += snapCaptions[i].offsetHeight;
+            }
+            return -dist;
+        }
+
+        syncHeroCaptionMaskHeight();
+
+        /** Inner track shifts content; theme demos without it use parallel y on each caption. */
+        const captionMotionTargets = captionTrack || snapCaptions;
 
         ScrollTrigger.create({
             trigger: slides, start: "top top", end: "+=" + vh * (slides.length - 1),
@@ -230,20 +255,26 @@ $(function () {
             scrub: true,
         });
 
-        gsap.fromTo(
-            snapCaptions,
-            { y: 0 },
-            {
-                y: -snapCaptions[0].offsetHeight * (snapCaptions.length - 1),
-                scrollTrigger: {
-                    trigger: holder,
-                    scrub: true,
-                    start: "top top",
-                    end: "+=" + innerHeight * (slides.length - 1),
-                },
-                ease: "none",
-            }
-        );
+        if (captionWrap && snapCaptions.length && captionMotionTargets) {
+            gsap.fromTo(
+                captionMotionTargets,
+                { y: 0 },
+                {
+                    y: () => captionStackTravelPx(),
+                    scrollTrigger: {
+                        trigger: holder,
+                        scrub: true,
+                        start: "top top",
+                        end: "+=" + innerHeight * (slides.length - 1),
+                        invalidateOnRefresh: true,
+                        onRefresh: () => {
+                            syncHeroCaptionMaskHeight();
+                        },
+                    },
+                    ease: "none",
+                }
+            );
+        }
 
         gsap.set(slides, { height: vh });
 
@@ -271,6 +302,10 @@ $(function () {
                     ease: "none"
                 });
             }
+        });
+
+        requestAnimationFrame(() => {
+            if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
         });
     }
 
