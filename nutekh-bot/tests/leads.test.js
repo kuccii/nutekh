@@ -86,3 +86,49 @@ test('recordLead never throws on bad input', async () => {
   assert.ok(entry)
   assert.equal(entry.type, 'sales')
 })
+
+test('records where a lead came from', async () => {
+  const entry = await leads.recordLead(
+    { type: 'sales', business: 'Source Co', need: 'website', budget: '1.2M' },
+    { jid: '255744444444@s.whatsapp.net', source: 'fallback' }
+  )
+  assert.equal(entry.source, 'fallback')
+})
+
+test('defaults the source to marker', async () => {
+  const entry = await leads.recordLead(
+    { type: 'sales', business: 'Marker Co', need: 'website', budget: '1.2M' },
+    { jid: '255755555555@s.whatsapp.net' }
+  )
+  assert.equal(entry.source, 'marker')
+})
+
+test('dedupes a repeat of the same lead within the window', async () => {
+  const lead = { type: 'sales', business: 'Dedupe Co', need: 'CRM', budget: '4M' }
+  const ctx = { jid: '255711111111@s.whatsapp.net', source: 'marker' }
+  const first = await leads.recordLead(lead, ctx)
+  const second = await leads.recordLead(lead, ctx)
+  assert.equal(first.deduped, undefined)
+  assert.equal(second.deduped, true)
+  assert.equal(second.business, 'Dedupe Co')
+
+  const lines = fs.readFileSync(leads.LEADS_FILE, 'utf8').trim().split('\n')
+  const matches = lines.map((l) => JSON.parse(l)).filter((l) => l.business === 'Dedupe Co')
+  assert.equal(matches.length, 1)
+})
+
+test('does not dedupe a genuinely new need from the same contact', async () => {
+  const ctx = { jid: '255722222222@s.whatsapp.net' }
+  await leads.recordLead({ type: 'sales', business: 'Repeat Co', need: 'website' }, ctx)
+  const second = await leads.recordLead({ type: 'sales', business: 'Repeat Co', need: 'mobile money' }, ctx)
+  assert.notEqual(second.deduped, true)
+})
+
+test('does not re-alert the owner for a duplicate', async () => {
+  let alerts = 0
+  const ctx = { jid: '255733333333@s.whatsapp.net', sendOwner: async () => { alerts++ } }
+  const lead = { type: 'support', business: 'Alert Co', need: 'cannot log in' }
+  await leads.recordLead(lead, ctx)
+  await leads.recordLead(lead, ctx)
+  assert.equal(alerts, 1)
+})

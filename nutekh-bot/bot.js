@@ -286,7 +286,7 @@ async function handleDM(sock, jid, m) {
 
   try {
     await sock.sendPresenceUpdate('composing', jid).catch(() => {})
-    const { reply, lead, doc } = await answerDM(effective, hist, usermem.notes(jid), { firstContact })
+    const { reply, lead, leadSource, doc } = await answerDM(effective, hist, usermem.notes(jid), { firstContact })
 
     usermem.push(jid, 'user', effective)
     if (reply) {
@@ -300,7 +300,7 @@ async function handleDM(sock, jid, m) {
     if (doc) await sendRegisteredDoc(sock, jid, doc)
     if (lead) {
       await recordLead(lead, {
-        jid, name, channel: 'dm',
+        jid, name, channel: 'dm', source: leadSource,
         transcript: usermem.history(jid),
         sendOwner,
       })
@@ -343,7 +343,7 @@ async function handleGroup(sock, chatId, m, entry) {
 
   try {
     await sock.sendPresenceUpdate('composing', chatId).catch(() => {})
-    const { reply, lead, skipped } = await answerAuto(entry.text, hist, recent, { addressed: true })
+    const { reply, lead, leadSource, skipped } = await answerAuto(entry.text, hist, recent, { addressed: true })
     if (skipped || !reply) return
 
     await randomDelay()
@@ -355,7 +355,7 @@ async function handleGroup(sock, chatId, m, entry) {
 
     if (lead) {
       await recordLead(lead, {
-        jid: entry.senderId, name: entry.senderName, channel: 'group',
+        jid: entry.senderId, name: entry.senderName, channel: 'group', source: leadSource,
         transcript: threadHistory.get(key) || [],
         sendOwner,
       })

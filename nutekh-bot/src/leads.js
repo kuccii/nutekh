@@ -12,6 +12,9 @@ const RESEND_TO = (process.env.RESEND_TO || 'hello@nutekh.com')
 
 const FIELDS = ['type', 'business', 'contact', 'need', 'location', 'budget', 'timeline', 'notes']
 
+const DEDUPE_MS = Number(process.env.LEAD_DEDUPE_HOURS || 6) * 3600 * 1000
+const DEDUPE_SCAN = Number(process.env.LEAD_DEDUPE_SCAN || 200)
+
 function normalize(lead) {
   const out = {}
   for (const k of FIELDS) {
@@ -64,6 +67,26 @@ async function email(entry, text) {
   }
 }
 
+function identity(entry) {
+  return [entry.from || entry.contact, entry.business, entry.need]
+    .map((v) => String(v || '').trim().toLowerCase())
+    .join('|')
+}
+
+/** The same contact asking the same thing again inside the window is one lead. */
+function findDuplicate(entry, rows) {
+  const id = identity(entry)
+  if (id === '||') return null
+  const now = Date.parse(entry.at) || Date.now()
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i]
+    if (identity(r) !== id) continue
+    const t = Date.parse(r.at)
+    if (Number.isFinite(t) && now - t <= DEDUPE_MS) return r
+  }
+  return null
+}
+
 /**
  * Persist a qualified lead or support request and alert the owners.
  * Never throws: lead capture must not break the customer conversation.
@@ -76,6 +99,7 @@ async function recordLead(lead, ctx = {}) {
       from: ctx.jid || '',
       fromName: ctx.name || '',
       channel: ctx.channel || 'dm',
+      source: ctx.source || (lead && lead.source) || 'marker',
     }
     if (Array.isArray(ctx.transcript) && ctx.transcript.length) {
       entry.transcript = ctx.transcript.slice(-6).map((h) => ({
@@ -83,6 +107,13 @@ async function recordLead(lead, ctx = {}) {
         text: String(h.text || '').slice(0, 400),
       }))
     }
+
+    const duplicate = findDuplicate(entry, recent(DEDUPE_SCAN))
+    if (duplicate) {
+      console.log(`leads: duplicate ${entry.type} from ${entry.from || entry.contact || 'unknown'} — already recorded ${duplicate.at}`)
+      return { ...duplicate, deduped: true }
+    }
+
     fs.appendFileSync(LEADS_FILE, JSON.stringify(entry) + '\n')
 
     const text = format(entry)
@@ -105,4 +136,4 @@ function recent(limit = 20) {
   } catch { return [] }
 }
 
-module.exports = { recordLead, normalize, format, recent, LEADS_FILE }
+module.exports = { recordLead, normalize, format, recent, findDuplicate, LEADS_FILE }

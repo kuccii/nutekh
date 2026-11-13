@@ -41,6 +41,9 @@ $SUDO mkdir -p "$APP_DIR"
 $SUDO mkdir -p "$APP_DIR"/{logs,data,documents,media}
 
 log "Copying application files"
+if [[ "$(cd "$SRC" && pwd -P)" == "$(cd "$APP_DIR" 2>/dev/null && pwd -P)" ]]; then
+  warn "Already running from $APP_DIR; skipping the file copy"
+else
 $SUDO rsync -a --delete \
   --exclude node_modules \
   --exclude .venv \
@@ -52,6 +55,7 @@ $SUDO rsync -a --delete \
   --exclude logs \
   --exclude tests/.tmp \
   "$SRC"/ "$APP_DIR"/
+fi
 
 log "Installing Node dependencies"
 cd "$APP_DIR"

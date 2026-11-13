@@ -1,4 +1,4 @@
-const { chat } = require('./llm')
+const { chat, chatJSON } = require('./llm')
 const memory = require('./memory')
 const { embedQuery } = require('./embed')
 const { cleanReply, stripLeadingIntro } = require('./sanitize')
@@ -40,7 +40,10 @@ STYLE (WhatsApp)
 - Short paragraphs. Two to four paragraphs is usually enough.
 - Use *bold* sparingly for key labels. No markdown headings, tables, or code blocks.
 - Ask ONE question at a time. Do not send a form or a wall of text.
-- Mirror the customer's language: English or Kiswahili. If they mix, mirror the mix.
+- Mirror the customer's language exactly: English stays English, Kiswahili stays
+  Kiswahili. Never greet in a different language from the message you are answering.
+  If they mix, mirror the mix. Never open with a Swahili greeting for an English
+  message, or the reverse.
 - Do not re-greet on every message; greet only on the first contact.
 - End with a clear next step.
 
@@ -107,6 +110,91 @@ function systemPrompt(mode, notes, opts = {}) {
   return s
 }
 
+// ---------------------------------------------------------------------------
+// Lead extraction fallback
+//
+// The model is asked to append a [[LEAD:{...}]] marker, but it sometimes answers
+// a fully-qualified enquiry without emitting one. When that happens we run a
+// small second pass that extracts the same fields from the conversation, so a
+// genuine lead is not lost.
+// ---------------------------------------------------------------------------
+
+const MIN_EXTRACT_CHARS = Number(process.env.LEAD_EXTRACT_MIN_CHARS || 50)
+const LEAD_KEYS = ['business', 'contact', 'need', 'location', 'budget', 'timeline']
+const PLACEHOLDERS = new Set(['', 'unknown', 'n/a', 'na', 'none', '-', '--', 'null', 'undefined', 'not sure', 'not given', 'not provided'])
+
+function meaningful(v) {
+  const s = (v == null ? '' : String(v)).trim()
+  return s && !PLACEHOLDERS.has(s.toLowerCase()) ? s : ''
+}
+
+/** True when a message is substantial enough to be worth a second extraction pass. */
+function shouldExtract(text, history = []) {
+  const body = String(text || '').trim()
+  if (!body) return false
+  const userTurns = (history || []).filter((h) => h && h.role === 'user').length + 1
+  return body.length >= MIN_EXTRACT_CHARS || userTurns >= 2
+}
+
+/** Turn a raw extractor response into a clean lead, or null if it is not qualified. */
+function normalizeLeadCandidate(obj) {
+  if (!obj || typeof obj !== 'object') return null
+  const out = { type: /support/i.test(String(obj.type || '')) ? 'support' : 'sales' }
+  let known = 0
+  for (const k of LEAD_KEYS) {
+    const v = meaningful(obj[k])
+    out[k] = v
+    if (v) known++
+  }
+  out.notes = meaningful(obj.notes)
+  return known >= 3 ? out : null
+}
+
+const EXTRACT_SYSTEM = `You extract structured lead data from a WhatsApp conversation for Nutekh, a digital transformation agency in Dar es Salaam, Tanzania.
+
+Return ONLY a JSON object with these keys: type, business, contact, need, location, budget, timeline, notes.
+- type: "sales" for a new enquiry, "support" for an existing client issue.
+- Use ONLY facts the customer actually stated. Never invent, guess, or infer a value.
+- Use an empty string "" for anything the customer did not say.
+- contact is the phone number, email, or handle the customer gave for follow-up.
+- notes: one short sentence of extra context, or "".
+- Return a lead ONLY if at least three of business, contact, need, location, budget, timeline are genuinely known. Otherwise return {}.
+No prose, no markdown, no code fences.`
+
+function buildExtractMessages(text, history = []) {
+  const convo = (history || [])
+    .slice(-8)
+    .map((h) => `${h && h.role === 'assistant' ? 'Assistant' : 'Customer'}: ${String((h && h.text) || '').slice(0, 400)}`)
+    .join('\n')
+  return [
+    { role: 'system', content: EXTRACT_SYSTEM },
+    {
+      role: 'user',
+      content: `${convo ? `CONVERSATION SO FAR:\n${convo}\n\n` : ''}LATEST CUSTOMER MESSAGE: "${String(text || '').slice(0, 1200)}"\n\nReturn the JSON object now.`,
+    },
+  ]
+}
+
+/**
+ * Second-pass lead extraction. Returns a normalized lead or null.
+ * `opts.json` lets tests inject a fake extractor.
+ */
+async function extractLead(text, history = [], opts = {}) {
+  if (opts.force !== true && !shouldExtract(text, history)) return null
+  const call = opts.json || chatJSON
+  try {
+    const raw = await call(buildExtractMessages(text, history), {
+      max_tokens: 400,
+      label: 'lead',
+      priority: opts.priority || 'low',
+    })
+    return normalizeLeadCandidate(raw)
+  } catch (e) {
+    console.log('brain: lead extraction failed -', e.message)
+    return null
+  }
+}
+
 function parseMarkers(raw) {
   let text = String(raw || '')
   let lead = null
@@ -163,7 +251,15 @@ async function answerDM(text, history = [], notes = '', opts = {}) {
   const parsed = parseMarkers(raw)
   let reply = tidy(parsed.text, { stripIntro: !opts.firstContact })
   if (!reply) reply = "I'm here to help with Nutekh's services, packages, and support. What would you like to know?"
-  return { reply, lead: parsed.lead, doc: parsed.doc, skipped: false, sources: rows.length }
+
+  let lead = parsed.lead
+  let leadSource = lead ? 'marker' : null
+  if (!lead) {
+    lead = await extractLead(text, history)
+    if (lead) leadSource = 'fallback'
+  }
+
+  return { reply, lead, leadSource, doc: parsed.doc, skipped: false, sources: rows.length }
 }
 
 async function answerAuto(text, history = [], recent = [], opts = {}) {
@@ -180,11 +276,19 @@ async function answerAuto(text, history = [], recent = [], opts = {}) {
 
   const raw = await chat(messages, { max_tokens: 700 })
   const parsed = parseMarkers(raw)
-  if (parsed.skipped) return { reply: '', lead: null, doc: null, skipped: true, sources: rows.length }
+  if (parsed.skipped) return { reply: '', lead: null, leadSource: null, doc: null, skipped: true, sources: rows.length }
 
   const reply = tidy(parsed.text)
-  if (!reply) return { reply: '', lead: null, doc: null, skipped: true, sources: rows.length }
-  return { reply, lead: parsed.lead, doc: parsed.doc, skipped: false, sources: rows.length }
+  if (!reply) return { reply: '', lead: null, leadSource: null, doc: null, skipped: true, sources: rows.length }
+
+  let lead = parsed.lead
+  let leadSource = lead ? 'marker' : null
+  if (!lead) {
+    lead = await extractLead(text, history)
+    if (lead) leadSource = 'fallback'
+  }
+
+  return { reply, lead, leadSource, doc: parsed.doc, skipped: false, sources: rows.length }
 }
 
 module.exports = {
@@ -192,5 +296,8 @@ module.exports = {
   answerAuto,
   parseMarkers,
   retrieve,
+  extractLead,
+  shouldExtract,
+  normalizeLeadCandidate,
   PERSONA,
 }

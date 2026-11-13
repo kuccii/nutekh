@@ -53,7 +53,7 @@ async function main() {
   console.log('\n--- reply ---\n')
   console.log(res.reply)
   console.log(`\n(sources: ${res.sources})`)
-  if (res.lead) console.log('\nlead captured:\n' + JSON.stringify(res.lead, null, 2))
+  if (res.lead) console.log('\nlead captured (' + (res.leadSource || 'marker') + '):\n' + JSON.stringify(res.lead, null, 2))
 }
 
 main().catch((e) => {

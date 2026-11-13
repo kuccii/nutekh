@@ -136,12 +136,22 @@ available through the `[[DOC: id]]` marker and the registry in `src/docs.js`.
 
 ## Leads
 
-When a conversation qualifies, the brain emits a `[[LEAD: {...}]]` marker. The
-lead is then:
+When a conversation qualifies, the brain appends a `[[LEAD: {...}]]` marker to
+its reply. If the model answers a substantial enquiry (50+ characters, or after
+the customer has replied at least twice) **without** that marker, a small second
+pass re-reads the conversation and extracts the same fields, so a genuine lead is
+not lost. A second-pass lead needs at least three known fields to count.
+
+Every lead or support request is then:
 
 1. appended to `data/leads.jsonl`;
 2. sent to every `OWNER_JIDS` number on WhatsApp;
 3. emailed through Resend if `RESEND_API_KEY` is set.
+
+Each record carries a `source` (`marker` or `fallback`) so you can see how it was
+captured. The same contact asking the same thing again within
+`LEAD_DEDUPE_HOURS` (default 6) is treated as one lead: no duplicate record and
+no second alert.
 
 Lead capture is best-effort: a failure to notify never breaks the customer chat.
 
@@ -179,9 +189,10 @@ Back up `auth/` and `data/` regularly (they contain the session and leads).
 npm test
 ```
 
-Covers marker parsing, lead normalisation and recording, group addressing
-rules, knowledge seeding idempotency, and the published-price guard in the
-brief. Tests use a temporary data directory and never call the LLM.
+Covers marker parsing, the lead-extraction fallback, lead normalisation,
+deduplication and recording, group addressing rules, knowledge seeding
+idempotency, and the published-price guard in the brief. Tests use a temporary
+data directory and never call the LLM.
 
 To exercise the real model, use `npm run ask`.
 
