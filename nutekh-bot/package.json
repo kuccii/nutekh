@@ -1,0 +1,30 @@
+{
+  "name": "nutekh-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nutekh WhatsApp assistant — sales qualification and client support on WhatsApp",
+  "main": "bot.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node bot.js",
+    "ask": "node scripts/ask.js",
+    "seed": "node scripts/seed-knowledge.js",
+    "test": "node --test \"tests/*.test.js\""
+  },
+  "keywords": [
+    "nutekh",
+    "whatsapp",
+    "assistant",
+    "baileys"
+  ],
+  "author": "Nutekh",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "better-sqlite3": "^12.2.0",
+    "pino": "^10.3.1"
+  }
+}

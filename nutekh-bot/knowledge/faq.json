@@ -1,0 +1,150 @@
+[
+  {
+    "id": "who-is-nutekh",
+    "text": "Q: Who is Nutekh? A: Nutekh is a digital transformation agency based in Dar es Salaam, Tanzania, serving businesses across East Africa. We help teams deploy, integrate, and scale practical systems for online presence, operations, marketing, and payments."
+  },
+  {
+    "id": "what-nutekh-does",
+    "text": "Q: What does Nutekh do? A: Nutekh covers four areas: Presence (website and verified Google/social profiles), Automate (invoicing, stock checks, approvals, reminders), Market (positioning, creative, WhatsApp lead flow), and Connect (POS, mobile money, and bank feeds matched in the background)."
+  },
+  {
+    "id": "deploy-integrate-scale",
+    "text": "Q: What do Deploy, Integrate, and Scale mean? A: Deploy gets the business visible and running on a real system. Integrate connects sales, stock, mobile money, bank feeds, and WhatsApp. Scale adds dashboards, spending controls, and reporting for owners and funders."
+  },
+  {
+    "id": "industries",
+    "text": "Q: Which industries does Nutekh work with? A: Retail, hospitality, healthcare, logistics, schools, and NGOs across Tanzania and the wider East Africa region."
+  },
+  {
+    "id": "location",
+    "text": "Q: Where is Nutekh located? A: Nutekh is headquartered in Dar es Salaam, Tanzania, and works with clients across East Africa."
+  },
+  {
+    "id": "hours",
+    "text": "Q: What are Nutekh's opening hours? A: Monday to Friday, 9:00 to 18:00 East Africa Time (EAT)."
+  },
+  {
+    "id": "contact",
+    "text": "Q: How can I contact Nutekh? A: Email hello@nutekh.com or info@nutekh.com, call or WhatsApp +255 748 000 000, or use the contact form on nutekh.com."
+  },
+  {
+    "id": "launch-price",
+    "text": "Q: How much does the Launch package cost? A: Launch setup is TZS 1.2M to 3.5M (USD 450 to 1,300). Support starts from TZS 180K per month."
+  },
+  {
+    "id": "grow-price",
+    "text": "Q: How much does the Grow package cost? A: Grow setup is TZS 4M to 12M (USD 1,500 to 4,500). Support starts from TZS 600K per month."
+  },
+  {
+    "id": "scale-price",
+    "text": "Q: How much does the Scale package cost? A: Scale starts from TZS 15M (USD 5,500 and above). The final figure is quoted after we agree the scorecard and scope."
+  },
+  {
+    "id": "launch-includes",
+    "text": "Q: What is included in Launch? A: Hresa or ImaliCloud go-live, a practical website with Google visibility, and WhatsApp lead flow. It is configured for East Africa's mixed mobile money and bank reality, with a typical go-live in about 7 days."
+  },
+  {
+    "id": "grow-includes",
+    "text": "Q: What is included in Grow? A: WhatsApp and mobile money wired in, CRM and lead pipeline setup, one paid channel (Meta or Google), and reliable hand-offs between the tools you already use. Typical timeline is about 30 days."
+  },
+  {
+    "id": "scale-includes",
+    "text": "Q: What is included in Scale? A: Dashboards your team will actually open, tighter spending controls, investor and sponsor checks, and reporting that lenders can follow. It suits multi-branch operations and businesses with outside backers."
+  },
+  {
+    "id": "which-package",
+    "text": "Q: Which package should I choose? A: Launch is for new or offline businesses that need to get live fast. Grow is for businesses ready to connect WhatsApp, mobile money, and existing tools. Scale is for multi-branch operations or businesses with investors or lenders."
+  },
+  {
+    "id": "launch-timeline",
+    "text": "Q: How long does Launch take? A: About 7 days from paper to first real-world use is the typical figure. It is a planning estimate, not a guarantee."
+  },
+  {
+    "id": "grow-timeline",
+    "text": "Q: How long does Grow take? A: About 30 days to reach a connected rhythm is the typical figure. It depends on how many systems need to be joined and how quickly your team can join discovery and training."
+  },
+  {
+    "id": "custom-scope",
+    "text": "Q: Can Nutekh handle custom scope or a different package? A: Yes. Anything outside the published packages is quoted after a free discovery call. A human will confirm scope, price, and timeline in writing."
+  },
+  {
+    "id": "hraesa",
+    "text": "Q: What is Hresa? A: Hresa is Nutekh's guest-flow product for busy venues. It covers QR ordering, readable kitchen tickets, and fast check-out, and it stays calm during rushes and event peaks."
+  },
+  {
+    "id": "imalicloud",
+    "text": "Q: What is ImaliCloud? A: ImaliCloud puts cash, payroll, and stock in one cloud so finance and operations stop living in separate spreadsheets."
+  },
+  {
+    "id": "rainmaker",
+    "text": "Q: What is Rainmaker? A: Rainmaker uses WhatsApp plus light AI to greet enquiries, filter tyre-kickers, follow up politely, and send serious buyers to your staff. Paid ads are added only after the free path already shows collected money."
+  },
+  {
+    "id": "vuka",
+    "text": "Q: What is VUKA? A: VUKA is Nutekh's operations product for upscale stays, hotels, and property. It pairs Hresa guest flow with ImaliCloud books so owners stop relying on late-night spreadsheets."
+  },
+  {
+    "id": "mobile-money",
+    "text": "Q: Does Nutekh connect mobile money? A: Yes. We connect MTN and Airtel mobile money (and similar rails) so taps, till sales, and bank deposits stay matched in the background."
+  },
+  {
+    "id": "pos-integration",
+    "text": "Q: Does Nutekh integrate POS and bank feeds? A: Yes. POS or card-reader sales and bank deposits are matched in the background, which reduces double entries and gives owners one place to settle disputes."
+  },
+  {
+    "id": "whatsapp-automation",
+    "text": "Q: Can Nutekh automate WhatsApp? A: Yes. We set up WhatsApp greetings, FAQs, lead capture, qualification, and polite follow-ups, with warm prospects handed to a human. This is the Rainmaker track."
+  },
+  {
+    "id": "website-google",
+    "text": "Q: Does Nutekh build websites and improve Google visibility? A: Yes. Presence work covers a clear, fast website plus verified Google and social profiles so buyers, guests, lenders, or partners trust the business on first look."
+  },
+  {
+    "id": "free-audit",
+    "text": "Q: Can I book a free call or audit? A: Yes. Nutekh offers a free 30-minute audit or planning call. The assistant can collect your details and arrange a hand-off to a human."
+  },
+  {
+    "id": "discovery-info",
+    "text": "Q: What does Nutekh need to quote? A: Your business type, location, the tools you use today, which payments you accept, what is slowing you down, your rough budget range, and your target timeline. A discovery call turns that into a written scope."
+  },
+  {
+    "id": "existing-tools",
+    "text": "Q: We already use other tools. Can you work with them? A: Yes. Grow is specifically about joining the apps you already pay for, including WhatsApp, mobile money, POS, and accounting exports, so income, stock, and follow-ups tell the same story."
+  },
+  {
+    "id": "training",
+    "text": "Q: Do you train the team? A: Yes. Deliveries are phased with discovery workshops, supervised configuration, rehearsals, parallel runs where needed, and training that matches how teams actually work between power cuts and WhatsApp pings."
+  },
+  {
+    "id": "support",
+    "text": "Q: Do you offer ongoing support? A: Yes. Launch retainers start from TZS 180K per month and Grow retainers from TZS 600K per month. Scale support is quoted with the scope."
+  },
+  {
+    "id": "existing-client-support",
+    "text": "Q: I am already a Nutekh client and need help. A: The assistant can answer questions about services, packages, and how things work. For account-specific issues, outages, or changes, it will pass the request to the support team and ask for your business name and a short description."
+  },
+  {
+    "id": "languages",
+    "text": "Q: Which languages does Nutekh support? A: Nutekh works in English and Kiswahili, and the assistant replies in the language the customer uses."
+  },
+  {
+    "id": "remote-work",
+    "text": "Q: Do you work with businesses outside Dar es Salaam? A: Yes. Nutekh works across Tanzania and the wider East Africa region, with remote discovery and on-site work where the rollout needs it."
+  },
+  {
+    "id": "data-handling",
+    "text": "Q: How is our business data handled? A: Data handling is agreed during discovery before any system is connected. For a specific security or data-protection question, the assistant will arrange a call with the team."
+  },
+  {
+    "id": "not-a-payment-provider",
+    "text": "Q: Is Nutekh a bank or mobile money provider? A: No. Nutekh connects the payment providers you already use. It does not replace your bank or mobile money operator and does not hold customer funds."
+  },
+  {
+    "id": "contracts",
+    "text": "Q: Can I get contract terms, licensing, or refund details? A: Those are handled by a human. The assistant will collect your question and pass it to the team rather than guess."
+  },
+  {
+    "id": "next-step",
+    "text": "Q: What is the next step? A: Share your business type, location, current tools, budget range, and timeline. The assistant will book a free 30-minute audit or pass your details to the Nutekh team."
+  }
+]

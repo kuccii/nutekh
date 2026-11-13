@@ -1,0 +1,33 @@
+module.exports = {
+  apps: [
+    {
+      name: 'nutekh-bot',
+      script: 'bot.js',
+      cwd: __dirname,
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      max_restarts: 50,
+      restart_delay: 5000,
+      kill_timeout: 10000,
+      time: true,
+      out_file: 'logs/pm2-out.log',
+      error_file: 'logs/pm2-err.log',
+      merge_logs: true,
+    },
+    {
+      name: 'nutekh-embed',
+      script: 'embed-service.py',
+      interpreter: '.venv/bin/python',
+      cwd: __dirname,
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      restart_delay: 5000,
+      time: true,
+      out_file: 'logs/embed-out.log',
+      error_file: 'logs/embed-err.log',
+      merge_logs: true,
+    },
+  ],
+}
