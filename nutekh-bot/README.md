@@ -11,6 +11,15 @@ It is built on the open-source [meti-ai-bot](https://github.com/Bsh54/meti-ai-bo
 whatsapp-bot (MIT). The WhatsApp, memory, retrieval and media layers are reused;
 the persona, brain, knowledge base and lead capture are Nutekh-specific.
 
+## Documentation
+
+- **[How it works](docs/HOW-IT-WORKS.md)** — architecture, the lifecycle of a
+  message, the brain and retrieval, knowledge, memory, groups, safety, and
+  operations.
+- **[How it generates leads](docs/LEAD-GENERATION.md)** — the qualification
+  funnel, the two capture paths, the lead record, owner alerts, dedupe, and how
+  to read and tune it.
+
 ---
 
 ## Requirements
