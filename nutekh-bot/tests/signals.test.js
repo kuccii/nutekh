@@ -45,3 +45,12 @@ test('scan writes signals once and marks messages processed', async () => {
   assert.equal(first.length, 1)
   assert.equal(second.length, 0, 'processed messages must not be re-classified')
 })
+
+test('scan persists signals down to the loosest policy confidence floor', async () => {
+  process.env.OUTREACH_MIN_CONFIDENCE = '0.6'
+  db.upsertGroup({ groupId: 'g3b@g.us', subject: 'Floor' })
+  db.addMessage({ groupId: 'g3b@g.us', senderJid: '250788000001@s.whatsapp.net', msgId: 's2', ts: Date.now(), text: 'We are launching a safari promo and need a booking website with payments' })
+  jsonReply = { results: [{ index: 0, is_signal: true, business: 'tour operator', need: 'booking website', intent: 'sales', confidence: 0.55 }] }
+  const written = await signals.scan()
+  assert.equal(written.length, 1, '0.55 must be persisted: it clears the loosest policy floor (0.5), not the external one (0.6)')
+})

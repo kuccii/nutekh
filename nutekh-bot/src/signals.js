@@ -7,6 +7,11 @@ const db = require('./prospectdb')
 
 const LINK_ONLY = /^https?:\/\/\S+$/
 
+// Mirrors prospect.OWNED_CONFIDENCE_RELIEF: persist down to the loosest floor any
+// group policy applies, so per-policy confidence gating in prospect.eligibility is
+// real rather than vacuous.
+const CONFIDENCE_RELIEF = 0.1
+
 function envNumber(name, fallback) {
   const raw = process.env[name]
   if (raw == null || raw === '') return fallback
@@ -100,6 +105,7 @@ async function classifyBatch(items) {
 // Read pending messages, classify the promising ones, persist qualifying signals.
 async function scan({ limit = 200 } = {}) {
   const minConfidence = envNumber('OUTREACH_MIN_CONFIDENCE', 0.6)
+  const writeFloor = Math.max(0, minConfidence - CONFIDENCE_RELIEF)
 
   const rows = db.pendingMessages(limit)
   if (!rows.length) return []
@@ -120,7 +126,7 @@ async function scan({ limit = 200 } = {}) {
   for (let i = 0; i < eligible.length; i++) {
     const r = byIndex.get(i)
     if (!r || !r.is_signal) continue
-    if (!(r.confidence >= minConfidence)) continue
+    if (!(r.confidence >= writeFloor)) continue
 
     const row = eligible[i]
     const id = db.addSignal({
