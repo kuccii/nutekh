@@ -7,11 +7,16 @@ process.env.LLM_API_KEY = 'test'
 
 const llmPath = require.resolve('../src/llm')
 let chatReply = 'Hi Juma — Nutekh here. Saw your safari promo...'
+let chatThrows = false
 let chatCalls = []
 require.cache[llmPath] = {
   id: llmPath, filename: llmPath, loaded: true,
   exports: {
-    chat: async (messages) => { chatCalls.push(messages); return chatReply },
+    chat: async (messages) => {
+      chatCalls.push(messages)
+      if (chatThrows) { chatThrows = false; throw new Error('transient LLM failure') }
+      return chatReply
+    },
     chatJSON: async () => null,
     CHAT_MODEL: 'stub', BASE: 'stub', KEY: 'test',
   },
@@ -153,4 +158,38 @@ test('run makes no candidate when the draft is empty', async () => {
   assert.equal(created, 0)
   assert.equal(cards.length, 0)
   assert.equal(handledFlag(sigId), 1, 'an empty draft is permanent')
+})
+
+// R18: a thrown draft call is transient — the signal stays retryable.
+test('run leaves the signal unhandled when the draft call throws', async () => {
+  chatReply = 'a draft that must never be used'
+  chatThrows = true
+  db.upsertGroup({ groupId: 'g4f@g.us', subject: 'Flaky LLM' })
+  db.upsertMember({ groupId: 'g4f@g.us', jid: '250788000010@s.whatsapp.net', phone: '250788000010', pushName: 'Flaky', dmable: 1 })
+  const sigId = insertSignal(
+    { ...signal, group_id: 'g4f@g.us', sender_jid: '250788000010@s.whatsapp.net' },
+    { msgId: 'r18a', confidence: 0.9 }
+  )
+  const cards = []
+  const created = await prospect.run({ now: Date.now(), sendOwner: async (t) => cards.push(t) })
+  assert.equal(created, 0)
+  assert.equal(cards.length, 0, 'sendOwner must not be called for a failed draft')
+  assert.equal(handledFlag(sigId), 0, 'a failed draft is transient: the signal stays retryable')
+})
+
+// R18: a genuinely empty reply is permanent — the signal is closed.
+test('run closes the signal when the model returns an empty draft', async () => {
+  chatThrows = false
+  chatReply = ''
+  db.upsertGroup({ groupId: 'g4g@g.us', subject: 'Empty Reply' })
+  db.upsertMember({ groupId: 'g4g@g.us', jid: '250788000011@s.whatsapp.net', phone: '250788000011', pushName: 'Silent', dmable: 1 })
+  const sigId = insertSignal(
+    { ...signal, group_id: 'g4g@g.us', sender_jid: '250788000011@s.whatsapp.net' },
+    { msgId: 'r18b', confidence: 0.9 }
+  )
+  const cards = []
+  const created = await prospect.run({ now: Date.now(), sendOwner: async (t) => cards.push(t) })
+  assert.equal(created, 0)
+  assert.equal(cards.length, 0)
+  assert.equal(handledFlag(sigId), 1, 'a genuinely empty draft is permanent')
 })

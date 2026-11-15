@@ -88,30 +88,27 @@ ${brief()}`
 
 /**
  * One LLM call grounded in the published facts plus the triggering signal.
- * Returns the trimmed draft, or `''` on any failure or empty reply.
+ * Returns the trimmed draft, or `''` on a genuinely empty reply. A thrown
+ * error is NOT swallowed: it propagates so the caller can treat a failed call
+ * as transient and retry the signal on the next scan.
  */
 async function draft(signal, member) {
-  try {
-    const s = signal || {}
-    const m = member || {}
-    const user = [
-      `Member name: ${m.push_name || 'unknown'}`,
-      `Member business: ${s.business || 'unknown'}`,
-      `Their need: ${s.need || 'unknown'}`,
-      `Intent: ${s.intent || 'unknown'}`,
-      `Their message: "${String(s.text || '').trim()}"`,
-      'Write the WhatsApp message now.',
-    ].join('\n')
+  const s = signal || {}
+  const m = member || {}
+  const user = [
+    `Member name: ${m.push_name || 'unknown'}`,
+    `Member business: ${s.business || 'unknown'}`,
+    `Their need: ${s.need || 'unknown'}`,
+    `Intent: ${s.intent || 'unknown'}`,
+    `Their message: "${String(s.text || '').trim()}"`,
+    'Write the WhatsApp message now.',
+  ].join('\n')
 
-    const reply = await chat(
-      [{ role: 'system', content: DRAFT_SYSTEM }, { role: 'user', content: user }],
-      { max_tokens: 400, priority: 'low' }
-    )
-    return String(reply == null ? '' : reply).trim()
-  } catch (e) {
-    console.log('prospect.draft: LLM call failed —', e && e.message)
-    return ''
-  }
+  const reply = await chat(
+    [{ role: 'system', content: DRAFT_SYSTEM }, { role: 'user', content: user }],
+    { max_tokens: 400, priority: 'low' }
+  )
+  return String(reply == null ? '' : reply).trim()
 }
 
 function formatCard(id, group, member, signal, text) {
@@ -187,9 +184,17 @@ async function run({ now = Date.now(), sendOwner = async () => {} } = {}) {
         continue
       }
 
-      const text = await draft(signal, member)
+      let text
+      try {
+        text = await draft(signal, member)
+      } catch (e) {
+        // A failed draft call is transient: leave the signal unhandled so the
+        // next scan retries it. A genuinely empty reply is handled below.
+        console.log('prospect.run: draft failed for signal', signal.id, '—', e && e.message)
+        continue
+      }
       if (!text) {
-        // An empty draft is permanent for this signal.
+        // A genuinely empty draft is permanent for this signal.
         db.markSignalHandled(signal.id)
         continue
       }
