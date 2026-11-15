@@ -19,7 +19,12 @@ const path = require('path')
 const readline = require('readline')
 
 const { answerDM, answerAuto } = require('./src/brain')
-const { isAddressed } = require('./src/addressing')
+const { isAddressed, isBroadcast } = require('./src/addressing')
+const prospectdb = require('./src/prospectdb')
+const roster = require('./src/roster')
+const signals = require('./src/signals')
+const prospect = require('./src/prospect')
+const outreach = require('./src/outreach')
 const { processDocument } = require('./src/media')
 const { recordLead, recent: recentLeads } = require('./src/leads')
 const { ensureSeeded } = require('./src/knowledge')
@@ -44,6 +49,12 @@ const DM_MAX = Number(process.env.DM_MAX || 0) // 0 = unlimited
 const GROUP_INGEST = (process.env.GROUP_INGEST ?? '0') === '1'
 const ANSWER_DELAY_MIN = Number(process.env.ANSWER_DELAY_MIN || 700)
 const ANSWER_DELAY_MAX = Number(process.env.ANSWER_DELAY_MAX || 1800)
+
+// Group prospecting (independent of GROUP_ANSWER / ANSWER_GROUPS).
+const PROSPECT_ENABLED = (process.env.PROSPECT_ENABLED ?? '0') === '1'
+const PROSPECT_GROUPS = splitList(process.env.PROSPECT_GROUPS)
+const SCAN_INTERVAL_MIN = Number(process.env.SCAN_INTERVAL_MIN || 10)
+const BACKFILL_HOURS = Number(process.env.BACKFILL_HOURS || 72)
 
 const ROOT = __dirname
 const AUTH_DIR = path.join(ROOT, 'auth')
@@ -189,11 +200,17 @@ async function sendOwner(text) {
 let currentSock = null
 let startedAt = Date.now()
 let stopping = false
+let scanTimer = null
 
 // ---------------------------------------------------------------------------
 // Owner commands
 // ---------------------------------------------------------------------------
 async function handleCommand(sock, jid, text) {
+  // The prospect router owns its own command names. It MUST be awaited: it is
+  // async, so an un-awaited call returns a Promise that is always truthy and
+  // would swallow /ping, /stats and /leads.
+  if (await outreach.handleCommand(sock, jid, text, { sendOwner })) return
+
   const cmd = text.trim().toLowerCase().split(/\s+/)[0]
   const reply = (t) => sock.sendMessage(jid, { text: t })
 
@@ -208,7 +225,7 @@ async function handleCommand(sock, jid, text) {
     if (!rows.length) return reply('No leads recorded yet.')
     return reply(rows.map((l) => `• ${l.at.slice(0, 16)} ${l.type} — ${l.business || l.contact || l.from}`).join('\n'))
   }
-  return reply('Commands: /ping, /stats, /leads')
+  return reply('Commands: /ping, /stats, /leads, /prospects, /groups, /members, /prospect on|off|own, /send, /edit, /skip')
 }
 
 // ---------------------------------------------------------------------------
@@ -426,6 +443,20 @@ async function start() {
         })
         console.log('\nTo answer in a group, add its id to ANSWER_GROUPS in .env\n')
       }).catch((e) => console.log('could not list groups:', e?.message))
+
+      if (PROSPECT_ENABLED) {
+        // `open` runs again on every reconnect: clear the old timer first so
+        // scan intervals never stack.
+        if (scanTimer) clearInterval(scanTimer)
+        scanTimer = setInterval(() => {
+          signals.scan()
+            .then(() => prospect.run({ sendOwner }))
+            .catch((e) => console.log('prospect scan:', e?.message))
+        }, SCAN_INTERVAL_MIN * 60000)
+        roster.refresh(sock)
+          .then((summaries) => console.log('prospect: enrolled', summaries.length, 'group(s)'))
+          .catch((e) => console.log('prospect: roster refresh failed -', e?.message))
+      }
     } else if (connection === 'close') {
       if (stopping) return console.log('stopped')
       const code = lastDisconnect?.error?.output?.statusCode
@@ -468,11 +499,61 @@ async function start() {
           text: textOf(m.message),
         }
         logMessage(entry)
+
+        // Prospecting capture — independent of GROUP_ANSWER and ANSWER_GROUPS.
+        // Runs for both live ('notify') and backlog ('append') messages; the
+        // age filter below is the whole of "backfill".
+        if (PROSPECT_ENABLED && (!PROSPECT_GROUPS.length || PROSPECT_GROUPS.includes(chatId))) {
+          const ts = Date.parse(entry.time) || Date.now()
+          const group = prospectdb.getGroup(chatId)
+          const mentions = contextOf(m).mentionedJid || []
+          const fresh = live || Date.now() - ts <= BACKFILL_HOURS * 3600000
+          if (
+            group && group.enabled
+            && (entry.text || '').trim()
+            && !entry.fromMe
+            && !isOwner(entry.senderId)
+            && !isBroadcast(entry.text, mentions.length)
+            && fresh
+          ) {
+            try {
+              prospectdb.addMessage({
+                groupId: chatId,
+                senderJid: entry.senderId,
+                senderName: entry.senderName,
+                msgId: entry.messageId,
+                ts,
+                text: entry.text,
+              })
+            } catch (e) { console.log('prospect capture:', e?.message) }
+          }
+        }
+
         if (!live || !GROUP_ANSWER) continue
         if (ANSWER_SET.size && !ANSWER_SET.has(chatId)) continue
         handleGroup(sock, chatId, m, entry)
       } catch (e) {
         console.log('upsert error -', e?.message)
+      }
+    }
+  })
+
+  // Registered once per socket (never inside the 'open' handler, which runs
+  // again on reconnect and would stack duplicate listeners).
+  sock.ev.on('groups.upsert', async (groups) => {
+    if (!PROSPECT_ENABLED) return
+    for (const g of groups || []) {
+      try {
+        if (!g || !g.id) continue
+        const s = roster.enrollGroup({ id: g.id, subject: g.subject, participants: g.participants || [] })
+        await sendOwner(
+          '*ADDED TO GROUP*\n'
+          + `Group: ${s.subject || s.groupId}\n`
+          + `Members: ${s.members} (${s.dmable} DM-able)\n`
+          + `Now prospecting. /prospect off ${s.groupId} to stop, /members ${s.groupId} to inspect.`
+        )
+      } catch (e) {
+        console.log('prospect groups.upsert:', e?.message)
       }
     }
   })

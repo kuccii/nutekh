@@ -120,6 +120,39 @@ Owner commands (DM only, from an `OWNER_JIDS` number):
 
 ---
 
+## Group prospecting
+
+Off by default (`PROSPECT_ENABLED=0`). When enabled, the bot watches the groups
+it is in for messages that reveal a business need Nutekh could serve (a promo
+that needs a page, a process that could be automated), drafts a short
+first-contact message, and DMs **you** an approval card. Nothing is ever sent to
+a member until you approve it with `/send`, and a daily cap, a per-member
+cooldown and a confidence floor gate every draft and every send.
+
+Once `PROSPECT_ENABLED=1`, **adding the bot to a group is the only action
+required** — the group auto-enrols and prospecting starts. It works even where
+the bot stays silent, because prospecting is independent of group answering
+(`GROUP_ANSWER` / `ANSWER_GROUPS`).
+
+Owner commands (DM only, from an `OWNER_JIDS` number):
+
+| Command | Action |
+|---|---|
+| `/prospects` | list pending candidates |
+| `/groups` | list discovered groups (subject, members, policy, on/off) |
+| `/members <group>` | roster with business guess and status |
+| `/prospect on\|off\|own <group>` | enable, disable, or mark a group `owned` (looser limits) |
+| `/send <id>` | enforce cap + cooldown, send the draft to the member |
+| `/edit <id> <text>` | replace the draft, then send |
+| `/skip <id>` | suppress the candidate (no re-draft during the cooldown) |
+
+Config lives in `.env` (`PROSPECT_GROUPS`, `SCAN_INTERVAL_MIN`,
+`SIGNAL_MIN_CHARS`, `BACKFILL_HOURS`, `OUTREACH_DAILY_CAP`,
+`OUTREACH_COOLDOWN_DAYS`, `OUTREACH_MIN_CONFIDENCE`). Leave `PROSPECT_ENABLED=0`
+unless you intend to prospect; every send is recorded in `data/outreach.jsonl`.
+
+---
+
 ## Knowledge
 
 Two layers keep answers correct:
