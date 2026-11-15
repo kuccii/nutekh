@@ -41,6 +41,7 @@ before anything is sent.
 | What qualifies | **Signal-based only.** Roster of everyone; drafts only on buying signals. |
 | Personalization source | **Group context only** (their posts + profile name + the brief). |
 | Group context | **Multiple groups**, a mix of owner-run and third-party. Per-group policy. |
+| Group onboarding | **Auto.** Adding the bot to a group is the only action required — it discovers, rosters, and prospects with no group IDs to configure. |
 | Volume | **Conservative: ~5 approved DMs/day.** |
 | Approval UX | **Live card per lead** over WhatsApp, matching `/ping` `/leads`. |
 
@@ -50,7 +51,8 @@ Approach A: extend the existing single bot process with an isolated prospecting
 layer. No second process, no second WhatsApp session.
 
 ```
-connect ─► roster sync (all PROSPECT_GROUPS), resolve @lid, mark dmable
+connect / groups.upsert ─► discover groups, roster sync, resolve @lid, mark dmable
+   │                       └► notify owner "added to <group>, N members"
    │
 live group msg ─► append to prospect_messages (no LLM)
    │
@@ -78,8 +80,10 @@ Reused unchanged: `src/llm.js`, `src/brain.js` (the DM brain that continues a
 conversation after outreach), `knowledge/brief.md`, `src/leads.js`, and the
 existing owner-command plumbing in `bot.js`.
 
-`bot.js` gains: (a) a cheap append of live group messages to `prospect_messages`
-for enabled groups, (b) a start/stop for the scan timer, (c) routing of the new
+`bot.js` gains: (a) group discovery on connect (`groupFetchAllParticipating()`)
+and on the `groups.upsert` event, so a group is picked up the moment the bot is
+added without a restart, (b) a cheap append of live group messages to
+`prospect_messages`, (c) a start/stop for the scan timer, (d) routing of the new
 owner commands.
 
 ## 5. Data model — `data/prospect.db` (new SQLite file)
@@ -129,7 +133,8 @@ OUTREACH_MIN_CONFIDENCE` becomes a `signals` row.
 
 ### Eligibility (`prospect.js`)
 
-A signal becomes a candidate only if: the group is enabled, the member is
+A signal becomes a candidate only if: the group is enabled (auto-enabled when the
+bot is added; the owner can disable it with `/prospect off`), the member is
 `dmable`, the member has not been `sent`/`suppressed` within
 `OUTREACH_COOLDOWN_DAYS`, there is no pending candidate for that member, and the
 daily cap is not reached.
@@ -160,36 +165,53 @@ Reply: /send 12 · /edit 12 <text> · /skip 12
 | Command | Action |
 |---|---|
 | `/prospects` | List pending candidates. |
+| `/groups` | List discovered groups: subject, members, policy, on/off. |
 | `/members <group>` | Roster with business guess and status. |
+| `/prospect off <group>` | Stop prospecting that group (keep the roster). |
+| `/prospect on <group>` | Re-enable a group. |
+| `/prospect own <group>` | Mark a group `owned` (more permissive limits). |
 | `/send <id>` | Enforce cap + cooldown, send the draft to the member. |
 | `/edit <id> <text>` | Replace the draft, then `/send`. |
 | `/skip <id>` | Mark `suppressed`; no re-draft for the cooldown. |
+
+When the bot is added to a group it sends one confirmation to `OWNER_JIDS`:
+
+```
+*ADDED TO GROUP*
+Group: Tour Operators TZ
+Members: 184 (171 DM-able)
+Now prospecting. /prospect off <id> to stop, /members <id> to inspect.
+```
 
 After `/send`, the message is recorded in the member's DM thread memory so the
 normal brain answers their reply with context.
 
 ## 8. Safety envelope
 
-- `PROSPECT_ENABLED=0` by default — a hard kill switch.
-- Only groups in `PROSPECT_GROUPS` are scanned (separate from `ANSWER_GROUPS`).
+- `PROSPECT_ENABLED=0` by default — a hard kill switch. Once set to `1`, adding
+  the bot to a group is all that is needed.
+- Every group the bot is added to is auto-enabled for prospecting and defaults to
+  the stricter **`external`** policy. The owner can `/prospect off` any group.
 - Signal-based only; non-posters are roster entries, never drafted.
-- Owner approval is mandatory; no auto-send path exists.
+- Prospecting is **independent of group answering** (`GROUP_ANSWER` /
+  `ANSWER_GROUPS`): the bot can prospect a group while staying silent in it.
+- Owner approval is mandatory; no auto-send path exists — the bot only ever DMs
+  the **owner** on its own.
 - Per-member cooldown (30 days) + daily cap (5) + min confidence (0.6) gate
   every draft and every send.
 - `external` groups use the stricter cap and require higher confidence than
-  `owned` groups. A newly discovered group defaults to **`external`** until the
-  owner marks it `owned`.
+  `owned` groups.
 - `dmable:false` members are shown but never drafted.
 - Every send appends to `data/outreach.jsonl` for audit.
-- v1 does **not** announce the bot's presence; the owner may announce it
+- v1 does **not** announce the bot to members; the owner may announce it
   manually in groups they run.
 
 ## 9. Configuration (new `.env` keys)
 
 | Key | Default | Purpose |
 |---|---|---|
-| `PROSPECT_ENABLED` | `0` | Kill switch for the whole feature. |
-| `PROSPECT_GROUPS` | *(empty)* | Group ids eligible for scanning/drafting. |
+| `PROSPECT_ENABLED` | `0` | Master switch. Set to `1` once; groups auto-enroll on add. |
+| `PROSPECT_GROUPS` | *(empty)* | **Optional override.** Empty = all groups the bot is in. Non-empty = only these ids. |
 | `SCAN_INTERVAL_MIN` | `10` | How often the scan timer runs. |
 | `SIGNAL_MIN_CHARS` | `40` | Pre-filter minimum message length. |
 | `BACKFILL_HOURS` | `72` | History scanned on first connect. |
@@ -197,8 +219,9 @@ normal brain answers their reply with context.
 | `OUTREACH_COOLDOWN_DAYS` | `30` | Per-member re-contact cooldown. |
 | `OUTREACH_MIN_CONFIDENCE` | `0.6` | Minimum classifier confidence. |
 
-Per-group `policy` (`owned`/`external`) is stored in the `groups` table and can be
-set via an owner command or config.
+Group state (`enabled`, `policy`) lives in the `groups` table and is driven by the
+owner commands above. `PROSPECT_GROUPS` is only needed if the owner wants to
+restrict prospecting to a fixed subset.
 
 ## 10. Testing
 
@@ -213,8 +236,9 @@ Unit tests with a stubbed LLM (no network):
 
 ## 11. Phasing
 
-1. **Phase 1 — see.** Roster sync + scan cursor + signal classification, surfaced
-   read-only via `/prospects` and `/members`. No drafts, no sends.
+1. **Phase 1 — see.** Group auto-discovery (connect + `groups.upsert`), roster
+   sync + scan cursor + signal classification, surfaced read-only via
+   `/prospects`, `/groups`, and `/members`. No drafts, no sends.
 2. **Phase 2 — draft + approve.** Drafting, owner cards, `/send` `/edit` `/skip`,
    cap/cooldown enforcement, thread seeding.
 3. **Phase 3 — tune.** Per-group policy tuning, audit log, confidence thresholds.
@@ -235,6 +259,6 @@ Unit tests with a stubbed LLM (no network):
 
 ## 13. Open questions
 
-None blocking. The two judgement calls above (new-group policy defaults to
-`external`; no bot announcement in v1) are resolved and can be revisited during
-Phase 3 tuning.
+None blocking. Resolved: new groups default to `external` policy; the bot does
+not announce itself to members in v1; `PROSPECT_GROUPS` is an optional override
+rather than a requirement. All can be revisited during Phase 3 tuning.
