@@ -108,6 +108,23 @@ test('/send with an unknown id is handled without sending', async () => {
   assert.equal(sock.sent.length, 1)
 })
 
+test('/skip refuses an already-sent candidate and leaves the send record intact', async () => {
+  db.upsertGroup({ groupId: 'g12@g.us', subject: 'Wholesale' })
+  db.upsertMember({ groupId: 'g12@g.us', jid: '250788666666@s.whatsapp.net', phone: '250788666666', dmable: 1 })
+  const id = db.createCandidate({ groupId: 'g12@g.us', senderJid: '250788666666@s.whatsapp.net', business: 'wholesale', intent: 'sales', signalIds: '14', draft: 'already out' })
+  db.updateCandidate(id, { status: 'sent', sentAt: Date.now(), decided: Date.now() })
+  db.setMemberStatus('g12@g.us', '250788666666@s.whatsapp.net', 'sent')
+
+  const sock = fakeSock()
+  const handled = await outreach.handleCommand(sock, OWNER, `/skip ${id}`, {})
+
+  assert.equal(handled, true)
+  assert.equal(sock.sent.length, 1, 'only the owner reply is sent')
+  assert.match(sock.sent[0][1], /cannot be skipped/)
+  assert.equal(db.getCandidate(id).status, 'sent')
+  assert.equal(db.getMember('g12@g.us', '250788666666@s.whatsapp.net').status, 'sent')
+})
+
 test('/edit replaces the draft and sends the new text unsplit', async () => {
   process.env.OUTREACH_DAILY_CAP = '5'
   db.upsertGroup({ groupId: 'g10@g.us', subject: 'Hospitality' })

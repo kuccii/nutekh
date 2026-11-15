@@ -144,6 +144,12 @@ async function handleSkip(sock, jid, args) {
   if (!Number.isInteger(id) || id <= 0) return safeReply(sock, jid, 'Usage: /skip <id>')
   const c = db.getCandidate(id)
   if (!c) return safeReply(sock, jid, `No candidate #${id}.`)
+  // Only a pending candidate can be skipped. Skipping one that was already
+  // sent would rewrite the send record and suppress a member we really
+  // messaged, so refuse instead of mutating.
+  if (c.status !== 'pending') {
+    return safeReply(sock, jid, `Candidate #${id} is already ${c.status} and cannot be skipped.`)
+  }
 
   db.updateCandidate(id, { status: 'skipped', decided: Date.now() })
   db.setMemberStatus(c.group_id, c.sender_jid, 'suppressed')
@@ -227,8 +233,17 @@ async function dispatch(sock, jid, { cmd, args }) {
  * bot.js can fall through to its existing commands. `deps = { sendOwner }` is
  * accepted for symmetry with the other prospect modules; replies go to the
  * owner's own DM via `sock.sendMessage(jid, { text })`.
+ *
+ * @returns {Promise<boolean>} resolves true when the text was a prospect
+ * command (handled or not), false otherwise. Callers MUST await this — the
+ * returned Promise is always truthy.
  */
 async function handleCommand(sock, jid, text, deps) {
+  // MUST be awaited: this function is async, so a bare call returns a Promise
+  // that is always truthy. Task 6 calls it as
+  // `if (await outreach.handleCommand(...)) return` — awaiting is what makes
+  // the boolean contract meaningful, and it ensures the member send resolves
+  // before the owner is told "sent".
   const parsed = parseCommand(text)
   if (!parsed) return false
 
