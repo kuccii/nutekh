@@ -414,23 +414,31 @@ async function start() {
 
   sock.ev.on('creds.update', saveCreds)
 
-  if (!sock.authState.creds.registered) {
-    let phone = PHONE
-    if (!phone) phone = digits(await ask('Bot WhatsApp number, international format, no + or spaces (e.g. 255748000000): '))
-    setTimeout(async () => {
+  let pairPhone = PHONE
+  if (!sock.authState.creds.registered && !pairPhone) {
+    pairPhone = digits(await ask('Bot WhatsApp number, international format, no + or spaces (e.g. 255748000000): '))
+  }
+  let pairingRequested = false
+
+  sock.ev.on('connection.update', async (update) => {
+    const { connection, lastDisconnect, qr } = update
+
+    // Request the pairing code once, when WhatsApp offers a QR: the socket is
+    // genuinely ready at that point. Requesting on a fixed timer races the
+    // handshake and can yield a code WhatsApp rejects as incorrect. Guarded so
+    // repeated QR refreshes don't churn (and invalidate) the code.
+    if (qr && !sock.authState.creds.registered && !pairingRequested) {
+      pairingRequested = true
       try {
-        const code = await sock.requestPairingCode(phone)
+        const code = await sock.requestPairingCode(pairPhone)
         console.log('\n==============================')
         console.log('  PAIRING CODE: ' + code)
         console.log('==============================')
         console.log('On the phone: WhatsApp > Linked devices > Link with phone number,')
         console.log('then enter this code.\n')
       } catch (e) { console.error('pairing code error:', e?.message || e) }
-    }, 3000)
-  }
+    }
 
-  sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update
     if (connection === 'open') {
       console.log('connected — listening for messages')
       sock.groupFetchAllParticipating().then((groups) => {
