@@ -159,6 +159,7 @@ test('/prospect off disables the group and /prospect own sets owned policy', asy
 test('listings render rows and a friendly line when empty', async () => {
   db.upsertGroup({ groupId: 'g11@g.us', subject: 'Printing' })
   db.upsertMember({ groupId: 'g11@g.us', jid: '250788555555@s.whatsapp.net', phone: '250788555555', pushName: 'Asha', dmable: 1 })
+  db.setMemberBusiness('g11@g.us', '250788555555@s.whatsapp.net', 'printing shop')
   const id = db.createCandidate({ groupId: 'g11@g.us', senderJid: '250788555555@s.whatsapp.net', business: 'print', intent: 'sales', signalIds: '13', draft: 'Karibu Asha' })
   const sock = fakeSock()
 
@@ -167,12 +168,34 @@ test('listings render rows and a friendly line when empty', async () => {
 
   await outreach.handleCommand(sock, OWNER, '/members g11@g.us', {})
   assert.match(sock.sent[1][1], /250788555555/)
+  assert.match(sock.sent[1][1], /printing shop/, '/members must show the business guess')
 
   await outreach.handleCommand(sock, OWNER, '/prospects', {})
   assert.match(sock.sent[2][1], new RegExp(`#${id} `))
 
   await outreach.handleCommand(sock, OWNER, '/members nope@g.us', {})
   assert.match(sock.sent[3][1], /No members/)
+})
+
+test('/skip starts the cooldown clock and a later /send is blocked by it', async () => {
+  process.env.OUTREACH_DAILY_CAP = '5'
+  process.env.OUTREACH_COOLDOWN_DAYS = '30'
+  db.upsertGroup({ groupId: 'g13@g.us', subject: 'Cool' })
+  db.upsertMember({ groupId: 'g13@g.us', jid: '250788777777@s.whatsapp.net', phone: '250788777777', dmable: 1 })
+
+  const skipId = db.createCandidate({ groupId: 'g13@g.us', senderJid: '250788777777@s.whatsapp.net', business: 'cool', intent: 'sales', signalIds: '20', draft: 'first' })
+  const sock = fakeSock()
+  await outreach.handleCommand(sock, OWNER, `/skip ${skipId}`, {})
+  assert.ok(
+    db.lastContactedAt('g13@g.us', '250788777777@s.whatsapp.net') > 0,
+    '/skip must start the cooldown clock so the member is not re-drafted'
+  )
+
+  const sendId = db.createCandidate({ groupId: 'g13@g.us', senderJid: '250788777777@s.whatsapp.net', business: 'cool', intent: 'sales', signalIds: '21', draft: 'second' })
+  const sock2 = fakeSock()
+  await outreach.handleCommand(sock2, OWNER, `/send ${sendId}`, {})
+  assert.equal(memberSent(sock2, '250788777777'), false, 'a member in cooldown must not be messaged')
+  assert.equal(db.getCandidate(sendId).status, 'pending', 'the blocked candidate stays pending')
 })
 
 test('handleCommand returns false for commands it does not own', async () => {

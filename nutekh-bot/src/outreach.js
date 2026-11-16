@@ -14,6 +14,8 @@ const usermem = require('./usermem')
 
 const COMMANDS = new Set(['prospects', 'groups', 'members', 'prospect', 'send', 'edit', 'skip'])
 
+const DAY = 86400000
+
 function envNumber(name, fallback) {
   const raw = process.env[name]
   if (raw == null || raw === '') return fallback
@@ -101,6 +103,17 @@ async function sendCandidate(sock, jid, id, draftOverride) {
     return safeReply(sock, jid, `Daily outreach cap reached (${sentToday}/${dailyCap}). Candidate #${id} stays pending.`)
   }
 
+  // Read the cooldown per call (not at module load) so a changed env is
+  // honoured. A member who was sent or suppressed within the window is never
+  // re-messaged — spec §7 ("/send: cap + cooldown") and §8 ("gate every draft
+  // and every send"). The draft-time eligibility gate normally covers this;
+  // this is the last line of defence before a member is messaged.
+  const cooldownDays = envNumber('OUTREACH_COOLDOWN_DAYS', 30)
+  const lastContacted = db.lastContactedAt(c.group_id, c.sender_jid)
+  if (lastContacted != null && Date.now() - lastContacted <= cooldownDays * DAY) {
+    return safeReply(sock, jid, `Candidate #${id} is in cooldown — ${c.sender_jid} was contacted recently. Not sent.`)
+  }
+
   const member = db.getMember(c.group_id, c.sender_jid)
   const memberJid = memberJidFor(member)
   if (!memberJid) {
@@ -151,8 +164,15 @@ async function handleSkip(sock, jid, args) {
     return safeReply(sock, jid, `Candidate #${id} is already ${c.status} and cannot be skipped.`)
   }
 
-  db.updateCandidate(id, { status: 'skipped', decided: Date.now() })
+  const now = Date.now()
+  db.updateCandidate(id, { status: 'skipped', decided: now })
   db.setMemberStatus(c.group_id, c.sender_jid, 'suppressed')
+  // Start the cooldown clock: a suppressed member must not be re-drafted (or
+  // re-sent) for OUTREACH_COOLDOWN_DAYS — spec §6 (eligibility: "not sent/
+  // suppressed within") and §7 ("/skip: mark suppressed; no re-draft for the
+  // cooldown"). `last_contacted` is the single cooldown timestamp the schema
+  // provides, so suppression records there too.
+  db.markContacted(c.group_id, c.sender_jid, now)
   return safeReply(sock, jid, `Skipped #${id}.`)
 }
 
@@ -209,7 +229,8 @@ async function handleMembers(sock, jid, args) {
   const group = db.getGroup(groupId)
   const lines = rows.map((m) => {
     const phone = m.phone ? ` (${m.phone})` : ''
-    return `${m.jid}${phone} · ${m.push_name || '-'} · ${m.dmable ? 'dmable' : 'not-dmable'} · ${m.status || 'member'}`
+    const biz = m.business_guess ? ` · ${m.business_guess}` : ''
+    return `${m.jid}${phone} · ${m.push_name || '-'}${biz} · ${m.dmable ? 'dmable' : 'not-dmable'} · ${m.status || 'member'}`
   })
   return safeReply(sock, jid, `Members of ${(group && group.subject) || groupId} (${rows.length}):\n${lines.join('\n')}`)
 }

@@ -201,6 +201,7 @@ let currentSock = null
 let startedAt = Date.now()
 let stopping = false
 let scanTimer = null
+let scanning = false
 
 // ---------------------------------------------------------------------------
 // Owner commands
@@ -449,9 +450,15 @@ async function start() {
         // scan intervals never stack.
         if (scanTimer) clearInterval(scanTimer)
         scanTimer = setInterval(() => {
+          // Skip a tick if the previous scan is still running: a slow scan
+          // (LLM retries) must not read the same unprocessed rows twice and
+          // write duplicate signals/candidates.
+          if (scanning) return
+          scanning = true
           signals.scan()
             .then(() => prospect.run({ sendOwner }))
             .catch((e) => console.log('prospect scan:', e?.message))
+            .finally(() => { scanning = false })
         }, SCAN_INTERVAL_MIN * 60000)
         roster.refresh(sock)
           .then((summaries) => console.log('prospect: enrolled', summaries.length, 'group(s)'))

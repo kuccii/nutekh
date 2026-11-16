@@ -54,3 +54,13 @@ test('scan persists signals down to the loosest policy confidence floor', async 
   const written = await signals.scan()
   assert.equal(written.length, 1, '0.55 must be persisted: it clears the loosest policy floor (0.5), not the external one (0.6)')
 })
+
+test('scan records the inferred business on the member for the roster', async () => {
+  process.env.OUTREACH_MIN_CONFIDENCE = '0.6'
+  db.upsertGroup({ groupId: 'g3c@g.us', subject: 'Roster' })
+  db.upsertMember({ groupId: 'g3c@g.us', jid: '250788000002@s.whatsapp.net', phone: '250788000002', dmable: 1 })
+  db.addMessage({ groupId: 'g3c@g.us', senderJid: '250788000002@s.whatsapp.net', msgId: 's3', ts: Date.now(), text: 'We are launching a safari promo and need a booking website with payments' })
+  jsonReply = { results: [{ index: 0, is_signal: true, business: 'safari tours', need: 'booking website', intent: 'sales', confidence: 0.9 }] }
+  await signals.scan()
+  assert.equal(db.getMember('g3c@g.us', '250788000002@s.whatsapp.net').business_guess, 'safari tours')
+})
