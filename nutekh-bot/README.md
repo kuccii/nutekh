@@ -152,7 +152,8 @@ Config lives in `.env` (`PROSPECT_GROUPS`, `SCAN_INTERVAL_MIN`,
 unless you intend to prospect; every send is recorded in `data/outreach.jsonl`.
 `PROSPECT_ENABLED=0` stops the automatic pipeline (watching, drafting and
 cards); the owner commands above still work, so you can always act on a card you
-already have — nothing is ever sent to a member without an explicit `/send`.
+already have — nothing is ever sent to a member without an explicit owner
+command (`/send` or `/edit`).
 
 ---
 

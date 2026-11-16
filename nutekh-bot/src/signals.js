@@ -142,7 +142,7 @@ async function scan({ limit = 200 } = {}) {
     })
     // Record the inferred business on the member so /members can show a
     // business guess (spec §7). Guarded so a blank guess never erases one.
-    if (r.business) db.setMemberBusiness(row.group_id, row.sender_jid, r.business)
+    if (r.business && r.business.trim()) db.setMemberBusiness(row.group_id, row.sender_jid, r.business)
     written.push({
       id,
       groupId: row.group_id,
