@@ -70,7 +70,7 @@ function eligibility(signal, member, opts) {
   return { ok: true, reason: 'ok' }
 }
 
-const DRAFT_SYSTEM = `You are Nutekh's outreach assistant. Nutekh is a digital transformation agency in Dar es Salaam, Tanzania that builds websites, booking systems, automations and tools for businesses across East Africa.
+const DRAFT_SYSTEM = `You are Nutekh's outreach assistant. Nutekh is a digital transformation agency in Kigali, Rwanda that builds websites, booking systems, automations and tools for businesses across East Africa.
 
 Write ONE short, warm first-contact WhatsApp message to a business owner whose group post suggests a need Nutekh can serve.
 
