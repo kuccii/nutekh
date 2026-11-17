@@ -82,6 +82,8 @@ test('classifier prompt targets business promotion, infers the service, and is l
   assert.match(system, /advertis|promot/i)
   assert.match(system, /infer/i)
   assert.match(system, /any language/i)
+  assert.match(system, /job|recruitment/i)
+  assert.match(system, /MLM/i)
 })
 
 test('classifyBatch keeps an inferred need with no explicit request', async () => {

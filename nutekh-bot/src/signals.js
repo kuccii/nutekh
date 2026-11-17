@@ -40,7 +40,7 @@ function preFilter(text, ctx = {}) {
 
 const SYSTEM_PROMPT = `You screen WhatsApp group messages for Nutekh, a digital transformation agency that builds websites, booking systems, automations and tools.
 
-For EACH numbered message decide whether it reveals a BUSINESS worth a Nutekh conversation. Set is_signal true when the message is a business advertising, promoting, selling or announcing its own products, services, offers, prices or launch — even when it asks for nothing. Also set is_signal true when the message describes a problem, request or growth goal Nutekh could serve. Set is_signal false for personal chatter, greetings, unrelated questions, news, job or recruitment ads, and forwarded or mass broadcasts.
+For EACH numbered message decide whether it reveals a BUSINESS worth a Nutekh conversation. Set is_signal true when the message is a business advertising, promoting, selling or announcing its own products, services, offers, prices or launch — even when it asks for nothing. Also set is_signal true when the message describes a problem, request or growth goal Nutekh could serve. Set is_signal false for personal chatter, greetings, unrelated questions, news, job, recruitment or MLM ads, and forwarded or mass broadcasts.
 
 Messages may be written in any language (English, Kinyarwanda, French, Swahili). Judge the meaning, not the language.
 
