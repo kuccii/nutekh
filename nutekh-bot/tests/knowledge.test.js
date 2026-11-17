@@ -28,14 +28,15 @@ test('seeded rows are pending embeddings until vectors are stored', () => {
   assert.ok(pending.every((r) => /^Q: .+ A: /s.test(r.text)))
 })
 
-test('brief carries the published price ranges', () => {
+test('brief carries the published price ranges in RWF', () => {
   const brief = knowledge.brief()
   assert.ok(brief.length > 1000)
-  assert.match(brief, /TZS 1\.2M – 3\.5M/)
-  assert.match(brief, /TZS 4M – 12M/)
-  assert.match(brief, /from TZS 15M/)
+  assert.match(brief, /RWF 700K – 1\.8M/)
+  assert.match(brief, /RWF 2M – 6M/)
+  assert.match(brief, /from RWF 8M/)
+  assert.match(brief, /Kigali, Rwanda/)
   assert.match(brief, /hello@nutekh\.com/)
-  assert.match(brief, /Monday to Friday/)
+  assert.match(brief, /Central Africa Time/)
 })
 
 test('faq ids are unique', () => {
