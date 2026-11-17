@@ -2,7 +2,7 @@ const { chat, chatJSON } = require('./llm')
 const memory = require('./memory')
 const { embedQuery } = require('./embed')
 const { cleanReply, stripLeadingIntro } = require('./sanitize')
-const { detectLang, needsRepair, LANG_NAMES } = require('./lang')
+const { confidentLang, needsRepair, LANG_NAMES } = require('./lang')
 const knowledge = require('./knowledge')
 
 const MAX_HISTORY = 10
@@ -249,7 +249,7 @@ async function repairLanguage(text, lang, chatFn) {
   ]
   try {
     const out = await chatFn(messages, { max_tokens: 500 })
-    const cleaned = String(out || '').trim()
+    const cleaned = String(out || '').replace(/\s*\[\[[\s\S]*$/, '').trim()
     return cleaned || text
   } catch (e) {
     console.log('brain: language repair failed -', e.message)
@@ -259,7 +259,8 @@ async function repairLanguage(text, lang, chatFn) {
 
 async function ensureLanguage(reply, customerText, opts = {}) {
   if (opts.langGuard === false) return reply
-  const expected = detectLang(customerText)
+  const expected = confidentLang(customerText)
+  if (!expected) return reply            // customer language ambiguous — trust the model's mirror
   if (!needsRepair(expected, reply)) return reply
   return repairLanguage(reply, expected, opts.chat || chat)
 }

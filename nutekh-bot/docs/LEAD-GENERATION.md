@@ -28,7 +28,7 @@ This lives in the `SALES FLOW` and `SUPPORT FLOW` sections of the persona in
 
 1. Be brief and useful.
 2. Collect: business name, what is happening, how urgent, and the best contact.
-3. Promise a human follow-up during working hours (Mon–Fri, 9:00–18:00 EAT).
+3. Promise a human follow-up during working hours (Mon–Fri, 9:00–18:00 CAT).
    Never promise an exact response time.
 4. Mark it as a support hand-off.
 

@@ -77,14 +77,17 @@ The same intent is reflected in `knowledge/faq.json` (`languages`) and
 
 Pure, synchronous detection. Exports:
 
-- `detectLang(text) -> 'en' | 'rw' | 'fr' | 'sw'` — default `'en'`.
-  Lowercases, tokenises on non-letters, and counts marker-word hits per language.
-  Returns the top language only when its score is **>= 2** and **strictly greater**
-  than every other language's score; ties or lower scores return `'en'`. Markers are
-  function/common words, e.g.:
+- `confidentLang(text) -> 'en' | 'rw' | 'fr' | 'sw' | null` — the confident
+  classifier. Lowercases, tokenises on non-letters, and counts marker-word hits per
+  language across all four languages. Returns the top language only when its score is
+  **>= 2** and **strictly greater** than every other language's score; ties or lower
+  scores return `null`. Markers are function/common words, e.g.:
+  - **en:** `the, is, are, was, were, what, how, much, does, do, you, your, we, our, can, could, would, should, need, want, price, cost, business, please, thanks, thank, hello, help, service, services, package, with, for, and, this, that, have, has`
   - **fr:** `bonjour, merci, vous, nous, je, est, pour, avec, prix, combien, s'il, la, les, des, une`
   - **rw:** `muraho, mwaramutse, amakuru, murakoze, yego, oya, kandi, cyane, ufite, nshaka, ndashaka, igiciro, amafaranga, kuki, gute`
   - **sw:** `habari, jambo, mambo, karibu, asante, ndiyo, hapana, naomba, bei, gani, vipi, nzuri, sana, ninataka, tunataka, pesa, shilingi`
+- `detectLang(text) -> 'en' | 'rw' | 'fr' | 'sw'` — `confidentLang(text) || 'en'`, so
+  its public contract keeps defaulting to `'en'` even when nothing is confident.
 - `LANG_NAMES = { en: 'English', rw: 'Kinyarwanda', fr: 'French', sw: 'Swahili' }`
 - `needsRepair(expected, replyText) -> boolean` — true only when the reply is
   **long enough to trust** (>= 40 characters) **and** `detectLang(replyText)` differs
@@ -97,10 +100,14 @@ In `answerDM` and `answerAuto`, **after** `parseMarkers` (so lead capture is
 untouched) and after `tidy`, run:
 
 ```
-expected = detectLang(customerText)
-if (needsRepair(expected, reply)):
+expected = confidentLang(customerText)
+if (expected and needsRepair(expected, reply)):
     reply = await rewriteInLanguage(reply, expected)   // ONE extra chat call
 ```
+
+The guard uses `confidentLang(customerText)` and does nothing when it returns `null`
+(ambiguous customer language), so a correct mirror of a short non-English message is
+never forced into English.
 
 `rewriteInLanguage(text, lang)` sends a single repair call:
 

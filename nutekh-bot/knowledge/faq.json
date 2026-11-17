@@ -125,7 +125,7 @@
   },
   {
     "id": "languages",
-    "text": "Q: Which languages does Nutekh support? A: Nutekh works in English, Kinyarwanda and French, and the assistant replies in the language the customer uses, with English as the default."
+    "text": "Q: Which languages does Nutekh support? A: Nutekh works in English, Kinyarwanda, French and Swahili, and the assistant replies in the language the customer uses, with English as the default."
   },
   {
     "id": "remote-work",

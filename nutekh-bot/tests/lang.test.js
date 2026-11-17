@@ -1,7 +1,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { detectLang, needsRepair, LANG_NAMES } = require('../src/lang')
+const { detectLang, needsRepair, LANG_NAMES, confidentLang } = require('../src/lang')
 
 test('detectLang defaults to English', () => {
   assert.equal(detectLang(''), 'en')
@@ -41,4 +41,20 @@ test('needsRepair leaves an English reply alone', () => {
 
 test('LANG_NAMES covers every detected language', () => {
   for (const l of ['en', 'rw', 'fr', 'sw']) assert.equal(typeof LANG_NAMES[l], 'string')
+})
+
+test('confidentLang is null for short or ambiguous text', () => {
+  assert.equal(confidentLang(''), null)
+  assert.equal(confidentLang('Combien?'), null)
+  assert.equal(confidentLang('Bonjour, hello'), null)
+})
+
+test('confidentLang positively identifies a substantial English message', () => {
+  assert.equal(confidentLang('How much does the Grow package cost?'), 'en')
+  assert.equal(confidentLang('How much is Grow?'), 'en')
+})
+
+test('detectLang still defaults to en when nothing is confident', () => {
+  assert.equal(detectLang('Combien?'), 'en')
+  assert.equal(detectLang(''), 'en')
 })

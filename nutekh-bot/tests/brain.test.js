@@ -168,3 +168,23 @@ test('ensureLanguage is a no-op when the guard is disabled', async () => {
   assert.equal(out, SW_REPLY)
   assert.equal(called, false)
 })
+
+test('ensureLanguage leaves a correct reply alone for a short ambiguous message', async () => {
+  const fr = 'Le pack Grow coûte RWF 2M. Voulez-vous réserver un audit gratuit avec notre équipe ?'
+  let called = false
+  const out = await ensureLanguage(fr, 'Combien?', {
+    chat: async () => { called = true; return 'x' },
+  })
+  assert.equal(out, fr)
+  assert.equal(called, false)
+})
+
+test('ensureLanguage repairs a Swahili reply to a short English message', async () => {
+  const sw = 'Habari, bei ya Grow ni ngapi? Asante sana kwa swali lako zuri.'
+  let used = null
+  const out = await ensureLanguage(sw, 'How much is Grow?', {
+    chat: async (messages) => { used = messages; return 'Grow starts at RWF 2M. Shall I book the free audit?' },
+  })
+  assert.match(out, /Grow starts at RWF 2M/)
+  assert.match(used[0].content, /English/)
+})

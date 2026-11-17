@@ -105,7 +105,7 @@ new code. Deleting `auth/` forces a fresh pairing.
 - **Groups** — silent unless directly addressed (name, `@mention`, or a reply to
   one of its messages). `GROUP_ANSWER=0` disables group replies entirely.
 - **Languages** — replies in the customer's language, with **English as the
-  default**; Kinyarwanda and French are mirrored when the customer uses them.
+  default**; Kinyarwanda, French and Swahili are mirrored when the customer uses them.
 - **Prices** — only the published ranges. Custom scope goes to a human.
 - **Timelines** — "about 7 days" (Launch) and "about 30 days" (Grow) are typical
   figures, never promises.
