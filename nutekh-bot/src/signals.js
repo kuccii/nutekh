@@ -28,7 +28,7 @@ function preFilter(text, ctx = {}) {
   if (!t) return false
   if (LINK_ONLY.test(t)) return false
 
-  const minChars = envNumber('SIGNAL_MIN_CHARS', 40)
+  const minChars = envNumber('SIGNAL_MIN_CHARS', 25)
   const letters = (t.match(/[a-z]/gi) || []).length
   if (letters < minChars) return false
 
@@ -40,7 +40,9 @@ function preFilter(text, ctx = {}) {
 
 const SYSTEM_PROMPT = `You screen WhatsApp group messages for Nutekh, a digital transformation agency that builds websites, booking systems, automations and tools.
 
-For EACH numbered message decide whether it reveals a business need Nutekh could serve. Set is_signal true ONLY when the message shows such a need — for example a promotion or launch that needs a page/site, a complaint about a process that could be automated, or an explicit request for tools, automation or a website. Otherwise is_signal is false.
+For EACH numbered message decide whether it reveals a BUSINESS worth a Nutekh conversation. Set is_signal true when the message is a business advertising, promoting, selling or announcing its own products, services, offers, prices or launch — even when it asks for nothing. Also set is_signal true when the message describes a problem, request or growth goal Nutekh could serve. Set is_signal false for personal chatter, greetings, unrelated questions, news, job or recruitment ads, and forwarded or mass broadcasts.
+
+Messages may be written in any language (English, Kinyarwanda, French, Swahili). Judge the meaning, not the language.
 
 Reply with JSON only, no prose, exactly this shape:
 {"results":[{"index":<n>,"is_signal":<bool>,"business":"","need":"","intent":"sales|support","confidence":0-1}]}
@@ -48,9 +50,9 @@ Reply with JSON only, no prose, exactly this shape:
 Rules:
 - index must be the number of the message you are judging.
 - business: the sender's business or sector, short ("" if unknown).
-- need: what Nutekh could provide, short ("" if none).
-- intent: "sales" for a growth/promotion opportunity, "support" for a problem/complaint to fix.
-- confidence: 0-1, how sure you are that this is a real, actionable signal.`
+- need: the Nutekh service that best fits this business. Infer it from what they sell or do even when the post states no need (e.g. a bakery advertising -> "online ordering / website"; a salon -> "booking system"). Short, "" only if truly no fit.
+- intent: "sales" for a business promoting itself or a growth opportunity, "support" for a problem or complaint to fix.
+- confidence: 0-1, how sure you are that this is a real business worth a Nutekh conversation.`
 
 // One batched classification call. Returns [] on null/malformed output.
 async function classifyBatch(items) {

@@ -8,9 +8,10 @@ process.env.OUTREACH_MIN_CONFIDENCE = '0.6'
 
 const llmPath = require.resolve('../src/llm')
 let jsonReply = null
+let jsonCalls = []
 require.cache[llmPath] = {
   id: llmPath, filename: llmPath, loaded: true,
-  exports: { chat: async () => '', chatJSON: async () => jsonReply, CHAT_MODEL: 'stub', BASE: 'stub', KEY: 'test' },
+  exports: { chat: async () => '', chatJSON: async (messages) => { jsonCalls.push(messages); return jsonReply }, CHAT_MODEL: 'stub', BASE: 'stub', KEY: 'test' },
 }
 
 const signals = require('../src/signals')
@@ -63,4 +64,47 @@ test('scan records the inferred business on the member for the roster', async ()
   jsonReply = { results: [{ index: 0, is_signal: true, business: 'safari tours', need: 'booking website', intent: 'sales', confidence: 0.9 }] }
   await signals.scan()
   assert.equal(db.getMember('g3c@g.us', '250788000002@s.whatsapp.net').business_guess, 'safari tours')
+})
+
+test('preFilter default floor is 25 letters and rejects empty/whitespace', () => {
+  process.env.SIGNAL_MIN_CHARS = ''
+  assert.equal(signals.preFilter('abcdefghijklmnopqrstuvwx'), false) // 24 letters
+  assert.equal(signals.preFilter('abcdefghijklmnopqrstuvwxy'), true) // 25 letters
+  assert.equal(signals.preFilter(''), false)
+  assert.equal(signals.preFilter('    '), false)
+})
+
+test('classifier prompt targets business promotion, infers the service, and is language-agnostic', async () => {
+  jsonCalls = []
+  jsonReply = { results: [] }
+  await signals.classifyBatch([{ index: 0, text: 'x' }])
+  const system = jsonCalls[0][0].content
+  assert.match(system, /advertis|promot/i)
+  assert.match(system, /infer/i)
+  assert.match(system, /any language/i)
+})
+
+test('classifyBatch keeps an inferred need with no explicit request', async () => {
+  jsonReply = { results: [{ index: 0, is_signal: true, business: 'bakery', need: 'online ordering / website', intent: 'sales', confidence: 0.7 }] }
+  const out = await signals.classifyBatch([{ index: 0, text: 'Fresh bread every morning in Kigali, order on 0788' }])
+  assert.equal(out.length, 1)
+  assert.equal(out[0].is_signal, true)
+  assert.equal(out[0].need, 'online ordering / website')
+
+  // An empty need or business must not drop the signal (both are optional).
+  jsonReply = { results: [{ index: 0, is_signal: true, business: '', need: '', intent: 'sales', confidence: 0.7 }] }
+  const blank = await signals.classifyBatch([{ index: 0, text: 'x' }])
+  assert.equal(blank.length, 1)
+  assert.equal(blank[0].need, '')
+  assert.equal(blank[0].business, '')
+})
+
+test('scan persists a promotion signal with an inferred need', async () => {
+  process.env.OUTREACH_MIN_CONFIDENCE = '0.6'
+  db.upsertGroup({ groupId: 'g3d@g.us', subject: 'Promo' })
+  db.addMessage({ groupId: 'g3d@g.us', senderJid: '250788000003@s.whatsapp.net', msgId: 's4', ts: Date.now(), text: 'Fresh bread every morning in Kigali, order on 0788 000 003' })
+  jsonReply = { results: [{ index: 0, is_signal: true, business: 'bakery', need: 'online ordering / website', intent: 'sales', confidence: 0.8 }] }
+  const written = await signals.scan()
+  assert.equal(written.length, 1)
+  assert.equal(written[0].need, 'online ordering / website')
 })
