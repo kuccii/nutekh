@@ -168,10 +168,11 @@ Group messages are not written into the knowledge store unless
 
 ## 7. Language
 
-The bot mirrors the customer's language. English and Kiswahili are first-class;
-the persona is explicit that it must never open with a Swahili greeting for an
-English message, or the reverse. Retrieval is multilingual because the
-embedding model is.
+The bot replies in the customer's language, with **English as the default**: an
+English message always gets an English reply. Kinyarwanda, French, or Swahili are
+mirrored only when the customer clearly writes in them. A dependency-free detector
+(`src/lang.js`) checks each reply, and a clearly wrong-language reply is rewritten
+once. Retrieval is multilingual because the embedding model is.
 
 ---
 

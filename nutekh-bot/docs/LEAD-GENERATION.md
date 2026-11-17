@@ -100,7 +100,7 @@ Each lead is one JSON line appended to `data/leads.jsonl`:
   "contact": "+250788000000",
   "need": "reliable stock and POS, moving off Excel",
   "location": "Kigali",
-  "budget": "TZS 5 million",
+  "budget": "RWF 5 million",
   "timeline": "next month",
   "notes": "Wants to talk.",
   "from": "250788000000@s.whatsapp.net",
@@ -139,7 +139,7 @@ Business: hardware shop
 Contact: +250788000000
 Need: reliable stock and POS, moving off Excel
 Location: Kigali
-Budget: TZS 5 million
+Budget: RWF 5 million
 Timeline: next month
 Notes: Wants to talk.
 Channel: dm
@@ -219,10 +219,10 @@ net — which is exactly the intent.
 **Customer:**
 
 > Hi, I run a hardware shop in Kigali. We use Excel and a POS we don't trust.
-> Budget is around TZS 5 million and we want to start next month. I am Eric,
+> Budget is around RWF 5 million and we want to start next month. I am Eric,
 > reach me on +250788000000. Which package fits and can we talk?
 
-**Bot reply:** recommends **Grow** (budget fits the TZS 4M–12M range), explains
+**Bot reply:** recommends **Grow** (budget fits the RWF 2M–6M range), explains
 it connects WhatsApp, mobile money and existing tools, and offers the free
 30-minute audit.
 
@@ -235,7 +235,7 @@ business: hardware shop
 contact:  +250788000000
 need:     reliable stock and POS, moving off Excel
 location: Kigali
-budget:   TZS 5 million
+budget:   RWF 5 million
 timeline: next month
 ```
 

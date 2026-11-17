@@ -9,10 +9,10 @@ process.env.EMBED_URL = 'http://127.0.0.1:1'
 const { parseMarkers, shouldExtract, normalizeLeadCandidate, extractLead, ensureLanguage } = require('../src/brain')
 
 test('parses a lead marker and strips it from the reply', () => {
-  const raw = 'Grow starts at TZS 4M. Shall I book the free audit?\n[[LEAD: {"type":"sales","business":"Shop","need":"POS","budget":"4-12M"}]]'
+  const raw = 'Grow starts at RWF 4M. Shall I book the free audit?\n[[LEAD: {"type":"sales","business":"Shop","need":"POS","budget":"4-12M"}]]'
   const out = parseMarkers(raw)
   assert.equal(out.skipped, false)
-  assert.equal(out.text, 'Grow starts at TZS 4M. Shall I book the free audit?')
+  assert.equal(out.text, 'Grow starts at RWF 4M. Shall I book the free audit?')
   assert.equal(out.lead.type, 'sales')
   assert.equal(out.lead.business, 'Shop')
   assert.equal(out.lead.budget, '4-12M')
@@ -77,7 +77,7 @@ test('normalizeLeadCandidate keeps a qualified lead and coerces the type', () =>
     type: 'Sales',
     business: 'Shop',
     need: 'POS',
-    budget: 'TZS 5M',
+    budget: 'RWF 5M',
     location: 'unknown',
   })
   assert.equal(out.type, 'sales')
@@ -111,7 +111,7 @@ test('extractLead recovers a lead the model forgot to mark', async () => {
       type: 'sales',
       business: 'hardware shop',
       need: 'stock and POS',
-      budget: 'TZS 5M',
+      budget: 'RWF 5M',
       location: 'Kigali',
     }),
   })

@@ -13,14 +13,14 @@ test('normalizes a sales lead', () => {
     business: '  Mlimani Shop ',
     contact: '+255 700 000 000',
     need: 'stock and mobile money',
-    budget: 'TZS 4M',
+    budget: 'RWF 4M',
     timeline: 'this month',
-    location: 'Dar es Salaam',
+    location: 'Kigali',
   })
   assert.equal(out.type, 'sales')
   assert.equal(out.business, 'Mlimani Shop')
   assert.equal(out.contact, '+255 700 000 000')
-  assert.equal(out.location, 'Dar es Salaam')
+  assert.equal(out.location, 'Kigali')
 })
 
 test('marks support cases and fills missing fields with empty strings', () => {
@@ -42,8 +42,8 @@ test('formats a readable owner alert', () => {
     business: 'Mlimani Shop',
     contact: '+255 700 000 000',
     need: 'stock control',
-    location: 'Dar es Salaam',
-    budget: 'TZS 4M',
+    location: 'Kigali',
+    budget: 'RWF 4M',
     timeline: 'this month',
     channel: 'dm',
     from: '255700000000@s.whatsapp.net',
@@ -51,7 +51,7 @@ test('formats a readable owner alert', () => {
   })
   assert.match(text, /NEW LEAD/)
   assert.match(text, /Mlimani Shop/)
-  assert.match(text, /TZS 4M/)
+  assert.match(text, /RWF 4M/)
   assert.match(text, /Channel: dm/)
 })
 

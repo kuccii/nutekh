@@ -29,10 +29,10 @@ require.cache[llmPath] = {
 
 const { answerDM } = require('../src/brain')
 
-const DETAILED = 'I run a hardware shop in Kigali and we use Excel plus a POS we do not trust. Budget is around TZS 5 million.'
+const DETAILED = 'I run a hardware shop in Kigali and we use Excel plus a POS we do not trust. Budget is around RWF 5 million.'
 
 test('answerDM trusts a lead marker when the model emits one', async () => {
-  chatReply = 'Grow fits your budget. Shall I book the audit?\n[[LEAD: {"type":"sales","business":"Hardware shop","need":"POS","budget":"TZS 5M"}]]'
+  chatReply = 'Grow fits your budget. Shall I book the audit?\n[[LEAD: {"type":"sales","business":"Hardware shop","need":"POS","budget":"RWF 5M"}]]'
   jsonReply = null
   jsonCalls = 0
 
@@ -44,7 +44,7 @@ test('answerDM trusts a lead marker when the model emits one', async () => {
 
 test('answerDM recovers a lead when the model forgets the marker', async () => {
   chatReply = 'Grow fits your budget. Shall I book the free 30-minute audit?'
-  jsonReply = { type: 'sales', business: 'Hardware shop', need: 'POS and stock', budget: 'TZS 5M', location: 'Kigali' }
+  jsonReply = { type: 'sales', business: 'Hardware shop', need: 'POS and stock', budget: 'RWF 5M', location: 'Kigali' }
   jsonCalls = 0
 
   const res = await answerDM(DETAILED, [], '')
@@ -54,7 +54,7 @@ test('answerDM recovers a lead when the model forgets the marker', async () => {
 })
 
 test('answerDM leaves a short question alone', async () => {
-  chatReply = 'Grow starts at TZS 4M.'
+  chatReply = 'Grow starts at RWF 4M.'
   jsonReply = { business: 'x', need: 'y', budget: 'z' }
   jsonCalls = 0
 

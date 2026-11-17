@@ -53,8 +53,8 @@ Set at minimum:
 LLM_API_KEY=sk-...
 LLM_BASE_URL=https://api.openai.com/v1
 CHAT_MODEL=gpt-4.1-mini
-PHONE=2557XXXXXXXX
-OWNER_JIDS=255754000000
+PHONE=2507XXXXXXXX
+OWNER_JIDS=2507XXXXXXXX
 ```
 
 Seed the knowledge base and test an answer **without** WhatsApp:
@@ -64,8 +64,8 @@ npm run seed
 npm run ask -- "How much is the Grow package?"
 ```
 
-Expected: Grow quoted as **TZS 4M – 12M (USD 1,500 – 4,500)**, retainer from
-**TZS 600K/month**, with a question back.
+Expected: Grow quoted as **RWF 2M – 6M (USD 1,500 – 4,500)**, retainer from
+**RWF 350K/month**, with a question back.
 
 ### Optional: embeddings
 
@@ -104,8 +104,8 @@ new code. Deleting `auth/` forces a fresh pairing.
   kept per customer in `data/dm-memory.json`.
 - **Groups** — silent unless directly addressed (name, `@mention`, or a reply to
   one of its messages). `GROUP_ANSWER=0` disables group replies entirely.
-- **Languages** — replies in the customer's language; English and Kiswahili are
-  first-class.
+- **Languages** — replies in the customer's language, with **English as the
+  default**; Kinyarwanda and French are mirrored when the customer uses them.
 - **Prices** — only the published ranges. Custom scope goes to a human.
 - **Timelines** — "about 7 days" (Launch) and "about 30 days" (Grow) are typical
   figures, never promises.
