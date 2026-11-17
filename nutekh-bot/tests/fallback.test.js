@@ -11,6 +11,7 @@ process.env.EMBED_URL = 'http://127.0.0.1:1'
 // cache entry does not leak into the other suites.
 const llmPath = require.resolve('../src/llm')
 let chatReply = ''
+let chatQueue = []
 let jsonReply = null
 let jsonCalls = 0
 require.cache[llmPath] = {
@@ -18,7 +19,7 @@ require.cache[llmPath] = {
   filename: llmPath,
   loaded: true,
   exports: {
-    chat: async () => chatReply,
+    chat: async () => (chatQueue.length ? chatQueue.shift() : chatReply),
     chatJSON: async () => { jsonCalls++; return jsonReply },
     CHAT_MODEL: 'stub',
     BASE: 'stub',
@@ -61,4 +62,19 @@ test('answerDM leaves a short question alone', async () => {
   assert.equal(res.lead, null)
   assert.equal(res.leadSource, null)
   assert.equal(jsonCalls, 0, 'short questions must not trigger a second LLM pass')
+})
+
+test('answerDM repairs a Swahili reply and still captures the lead marker', async () => {
+  chatQueue = [
+    'Habari, bei ya Grow ni ngapi? Asante sana kwa swali lako zuri.\n[[LEAD: {"type":"sales","business":"Hardware shop","need":"POS","budget":"RWF 5M"}]]',
+    'Grow starts at RWF 2M. Shall I book the free audit?',
+  ]
+  jsonReply = null
+  jsonCalls = 0
+
+  const res = await answerDM(DETAILED, [], '')
+  assert.match(res.reply, /Grow starts at RWF 2M/)
+  assert.equal(res.leadSource, 'marker')
+  assert.equal(res.lead.business, 'Hardware shop')
+  chatQueue = []
 })

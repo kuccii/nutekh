@@ -6,7 +6,7 @@ process.env.DATA_DIR = tmpDataDir()
 process.env.LLM_API_KEY = 'test'
 process.env.EMBED_URL = 'http://127.0.0.1:1'
 
-const { parseMarkers, shouldExtract, normalizeLeadCandidate, extractLead } = require('../src/brain')
+const { parseMarkers, shouldExtract, normalizeLeadCandidate, extractLead, ensureLanguage } = require('../src/brain')
 
 test('parses a lead marker and strips it from the reply', () => {
   const raw = 'Grow starts at TZS 4M. Shall I book the free audit?\n[[LEAD: {"type":"sales","business":"Shop","need":"POS","budget":"4-12M"}]]'
@@ -129,4 +129,42 @@ test('extractLead returns null when the extractor throws', async () => {
     json: async () => { throw new Error('offline') },
   })
   assert.equal(out, null)
+})
+
+const SW_REPLY = 'Habari, bei ya Grow ni ngapi? Asante sana kwa swali lako zuri.'
+
+test('ensureLanguage rewrites a Swahili reply to an English message', async () => {
+  let used = null
+  const out = await ensureLanguage(SW_REPLY, 'How much is Grow?', {
+    chat: async (messages) => { used = messages; return 'Grow starts at RWF 2M. Shall I book the free audit?' },
+  })
+  assert.match(out, /Grow starts at RWF 2M/)
+  assert.match(used[0].content, /English/)
+})
+
+test('ensureLanguage leaves a Kinyarwanda reply to a Kinyarwanda message alone', async () => {
+  const rw = 'Muraho, igiciro cya Grow ni RWF 2M. Nshaka kubaza byinshi ku bijyanye na serivisi.'
+  let called = false
+  const out = await ensureLanguage(rw, 'Muraho, igiciro cya Grow ni angahe?', {
+    chat: async () => { called = true; return 'x' },
+  })
+  assert.equal(out, rw)
+  assert.equal(called, false)
+})
+
+test('ensureLanguage keeps the original reply when the repair call fails', async () => {
+  const out = await ensureLanguage(SW_REPLY, 'How much is Grow?', {
+    chat: async () => { throw new Error('offline') },
+  })
+  assert.equal(out, SW_REPLY)
+})
+
+test('ensureLanguage is a no-op when the guard is disabled', async () => {
+  let called = false
+  const out = await ensureLanguage(SW_REPLY, 'How much is Grow?', {
+    langGuard: false,
+    chat: async () => { called = true; return 'x' },
+  })
+  assert.equal(out, SW_REPLY)
+  assert.equal(called, false)
 })

@@ -2,6 +2,7 @@ const { chat, chatJSON } = require('./llm')
 const memory = require('./memory')
 const { embedQuery } = require('./embed')
 const { cleanReply, stripLeadingIntro } = require('./sanitize')
+const { detectLang, needsRepair, LANG_NAMES } = require('./lang')
 const knowledge = require('./knowledge')
 
 const MAX_HISTORY = 10
@@ -237,6 +238,28 @@ function tidy(raw, opts = {}) {
   return text.replace(/\n{3,}/g, '\n\n').trim()
 }
 
+async function repairLanguage(text, lang, chatFn) {
+  const messages = [
+    { role: 'system', content: `Rewrite the message below in ${LANG_NAMES[lang] || 'English'} only. Keep the meaning and the short WhatsApp style. Output only the rewritten message.` },
+    { role: 'user', content: text },
+  ]
+  try {
+    const out = await chatFn(messages, { max_tokens: 500 })
+    const cleaned = String(out || '').trim()
+    return cleaned || text
+  } catch (e) {
+    console.log('brain: language repair failed -', e.message)
+    return text
+  }
+}
+
+async function ensureLanguage(reply, customerText, opts = {}) {
+  if (opts.langGuard === false) return reply
+  const expected = detectLang(customerText)
+  if (!needsRepair(expected, reply)) return reply
+  return repairLanguage(reply, expected, opts.chat || chat)
+}
+
 async function answerDM(text, history = [], notes = '', opts = {}) {
   const rows = await retrieve(text, history)
   const messages = [
@@ -251,6 +274,7 @@ async function answerDM(text, history = [], notes = '', opts = {}) {
   const parsed = parseMarkers(raw)
   let reply = tidy(parsed.text, { stripIntro: !opts.firstContact })
   if (!reply) reply = "I'm here to help with Nutekh's services, packages, and support. What would you like to know?"
+  reply = await ensureLanguage(reply, text, opts)
 
   let lead = parsed.lead
   let leadSource = lead ? 'marker' : null
@@ -278,7 +302,8 @@ async function answerAuto(text, history = [], recent = [], opts = {}) {
   const parsed = parseMarkers(raw)
   if (parsed.skipped) return { reply: '', lead: null, leadSource: null, doc: null, skipped: true, sources: rows.length }
 
-  const reply = tidy(parsed.text)
+  let reply = tidy(parsed.text)
+  reply = await ensureLanguage(reply, text, opts)
   if (!reply) return { reply: '', lead: null, leadSource: null, doc: null, skipped: true, sources: rows.length }
 
   let lead = parsed.lead
@@ -299,5 +324,6 @@ module.exports = {
   extractLead,
   shouldExtract,
   normalizeLeadCandidate,
+  ensureLanguage,
   PERSONA,
 }
