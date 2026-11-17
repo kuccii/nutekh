@@ -193,3 +193,34 @@ test('run closes the signal when the model returns an empty draft', async () => 
   assert.equal(cards.length, 0)
   assert.equal(handledFlag(sigId), 1, 'a genuinely empty draft is permanent')
 })
+
+test('the draft prompt pitches the business and offers the free audit', async () => {
+  chatCalls = []
+  chatReply = 'Hi — Nutekh here.'
+  await prospect.draft(signal, member)
+  const system = chatCalls[0][0].content
+  assert.match(system, /promot|advertis|running a business/i)
+  assert.match(system, /best fits their business/i)
+  assert.match(system, /free 30-minute audit/i)
+})
+
+test('draft still forms when the signal carries no business name', async () => {
+  chatCalls = []
+  chatReply = 'Hi — Nutekh here.'
+  const out = await prospect.draft({ ...signal, business: '' }, member)
+  assert.equal(out, 'Hi — Nutekh here.')
+})
+
+test('run dedupes a repeat promotion from the same member to one pending candidate', async () => {
+  chatReply = 'Hi — Nutekh here.'
+  db.upsertGroup({ groupId: 'g4h@g.us', subject: 'Repeat' })
+  db.upsertMember({ groupId: 'g4h@g.us', jid: '250788000012@s.whatsapp.net', phone: '250788000012', pushName: 'Repeat', dmable: 1 })
+  const cards = []
+  insertSignal({ ...signal, group_id: 'g4h@g.us', sender_jid: '250788000012@s.whatsapp.net' }, { msgId: 'r5a', confidence: 0.9 })
+  const first = await prospect.run({ now: Date.now(), sendOwner: async (t) => cards.push(t) })
+  insertSignal({ ...signal, group_id: 'g4h@g.us', sender_jid: '250788000012@s.whatsapp.net' }, { msgId: 'r5b', confidence: 0.9 })
+  const second = await prospect.run({ now: Date.now(), sendOwner: async (t) => cards.push(t) })
+  assert.equal(first, 1)
+  assert.equal(second, 0, 'a member with a pending candidate is not drafted again')
+  assert.equal(cards.length, 1)
+})
